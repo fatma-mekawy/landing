@@ -1,0 +1,3053 @@
+bash
+
+LOGO_B64=$(cat /tmp/logo_b64.txt)
+
+cat > /home/claude/pepar-v2.html << HTMLEOF <!DOCTYPE html>
+  <html lang="en">
+
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PEP Arab Control Systems — When Failure Is Not An Option</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link
+      href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:ital,wght@0,300;0,400;0,600;0,700;0,800;0,900;1,700&family=Barlow:wght@300;400;500;600&family=Share+Tech+Mono&display=swap"
+      rel="stylesheet">
+    <style>
+      :root {
+        --red: #ee2124;
+        --red-dark: #b81a1c;
+        --red-glow: rgba(238, 33, 36, 0.3);
+        --black: #1e1a17;
+        --black-2: #131110;
+        --black-3: #0c0a08;
+        --white: #ffffff;
+        --gray-2: #dedede;
+        --gray-3: #9a9a9a;
+        --gray-4: #484340;
+        --gray-5: #2c2825;
+        --card-bg: #1e1b18;
+        --border: rgba(255, 255, 255, 0.06);
+        --border-red: rgba(238, 33, 36, 0.25);
+        --mono: 'Share Tech Mono', monospace;
+        --display: 'Barlow Condensed', sans-serif;
+        --body: 'Barlow', sans-serif;
+      }
+
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0
+      }
+
+      html {
+        scroll-behavior: smooth
+      }
+
+      body {
+        background: var(--black-3);
+        color: var(--white);
+        font-family: var(--body);
+        line-height: 1.6;
+        overflow-x: hidden;
+        cursor: none
+      }
+
+      /* ── CUSTOM CURSOR ── */
+      #cursor {
+        position: fixed;
+        width: 12px;
+        height: 12px;
+        background: var(--red);
+        border-radius: 50%;
+        pointer-events: none;
+        z-index: 99999;
+        transform: translate(-50%, -50%);
+        transition: transform .1s, width .2s, height .2s, opacity .2s;
+        mix-blend-mode: normal
+      }
+
+      #cursor-ring {
+        position: fixed;
+        width: 36px;
+        height: 36px;
+        border: 1px solid rgba(238, 33, 36, 0.5);
+        border-radius: 50%;
+        pointer-events: none;
+        z-index: 99998;
+        transform: translate(-50%, -50%);
+        transition: transform .08s, width .3s, height .3s, border-color .3s;
+        clip-path: polygon(50% 0%, 55% 45%, 100% 50%, 55% 55%, 50% 100%, 45% 55%, 0% 50%, 45% 45%)
+      }
+
+      body:hover #cursor-ring {
+        border-color: rgba(238, 33, 36, 0.7)
+      }
+
+      /* ── NOISE ── */
+      body::before {
+        content: '';
+        position: fixed;
+        inset: 0;
+        background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.035'/%3E%3C/svg%3E");
+        pointer-events: none;
+        z-index: 99997;
+        opacity: .5
+      }
+
+      ::-webkit-scrollbar {
+        width: 3px
+      }
+
+      ::-webkit-scrollbar-track {
+        background: var(--black-3)
+      }
+
+      ::-webkit-scrollbar-thumb {
+        background: var(--red)
+      }
+
+      /* ── FLOATING PARTICLES CANVAS ── */
+      #particles-canvas {
+        position: fixed;
+        inset: 0;
+        pointer-events: none;
+        z-index: 0;
+        opacity: .6
+      }
+
+      /* ── NAV ── */
+      nav {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        z-index: 1000;
+        padding: 0 4%;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        height: 72px;
+        background: rgba(12, 10, 8, .8);
+        backdrop-filter: blur(20px) saturate(1.5);
+        border-bottom: 1px solid var(--border);
+        transition: all .3s
+      }
+
+      nav.scrolled {
+        background: rgba(12, 10, 8, .97);
+        box-shadow: 0 4px 60px rgba(0, 0, 0, .7), 0 1px 0 var(--border-red)
+      }
+
+      .nav-logo {
+        display: flex;
+        align-items: center;
+        text-decoration: none;
+        gap: 0
+      }
+
+      .nav-logo img {
+        height: 44px;
+        width: auto;
+        /* filter: brightness(0) invert(1); */
+        transition:  .3s 
+      }
+
+      .nav-logo:hover img {
+        filter: none
+      }
+
+      .nav-links {
+        display: flex;
+        gap: 28px;
+        list-style: none
+      }
+
+      .nav-links a {
+        text-decoration: none;
+        color: var(--gray-3);
+        font-family: var(--display);
+        font-weight: 600;
+        font-size: 12px;
+        letter-spacing: 2.5px;
+        text-transform: uppercase;
+        transition: color .2s;
+        position: relative;
+        padding-bottom: 2px
+      }
+
+      .nav-links a::after {
+        content: '';
+        position: absolute;
+        bottom: -2px;
+        left: 0;
+        width: 0;
+        height: 1px;
+        background: var(--red);
+        transition: width .3s
+      }
+
+      .nav-links a:hover {
+        color: var(--white)
+      }
+
+      .nav-links a:hover::after {
+        width: 100%
+      }
+
+      .nav-cta {
+        background: var(--red);
+        color: var(--white) !important;
+        padding: 9px 22px;
+        font-family: var(--display) !important;
+        font-weight: 700 !important;
+        font-size: 12px !important;
+        letter-spacing: 2px;
+        text-transform: uppercase;
+        text-decoration: none;
+        clip-path: polygon(10px 0, 100% 0, calc(100% - 10px) 100%, 0 100%);
+        transition: background .2s, box-shadow .2s !important;
+        box-shadow: 0 0 0 rgba(238, 33, 36, 0)
+      }
+
+      .nav-cta:hover {
+        background: var(--red-dark) !important;
+        box-shadow: 0 0 30px rgba(238, 33, 36, .4) !important
+      }
+
+      .nav-cta::after {
+        display: none !important
+      }
+
+      .hamburger {
+        display: none;
+        flex-direction: column;
+        gap: 5px;
+        cursor: none;
+        padding: 4px
+      }
+
+      .hamburger span {
+        display: block;
+        width: 22px;
+        height: 2px;
+        background: var(--white);
+        transition: all .3s
+      }
+
+      /* ── HERO ── */
+      .hero {
+        min-height: 100vh;
+        position: relative;
+        display: flex;
+        align-items: center;
+        overflow: hidden;
+        padding-top: 72px
+      }
+
+      .hero-bg {
+        position: absolute;
+        inset: 0;
+        background: radial-gradient(ellipse 80% 60% at 50% 100%, rgba(238, 33, 36, .07) 0%, transparent 60%), radial-gradient(ellipse 50% 40% at 80% 30%, rgba(238, 33, 36, .05) 0%, transparent 60%), linear-gradient(160deg, #0c0a08 0%, #12100e 50%, #0c0a08 100%)
+      }
+
+      /* Animated grid */
+      .hero-grid {
+        position: absolute;
+        inset: 0;
+        background-image: linear-gradient(rgba(238, 33, 36, .04) 1px, transparent 1px), linear-gradient(90deg, rgba(238, 33, 36, .04) 1px, transparent 1px);
+        background-size: 80px 80px;
+        animation: gridDrift 25s linear infinite
+      }
+
+      @keyframes gridDrift {
+        from {
+          transform: translateY(0) translateX(0)
+        }
+
+        to {
+          transform: translateY(80px) translateX(80px)
+        }
+      }
+
+      /* Diagonal accent lines */
+      .hero-diag {
+        position: absolute;
+        inset: 0;
+        overflow: hidden;
+        pointer-events: none
+      }
+
+      .hero-diag::before {
+        content: '';
+        position: absolute;
+        top: -100px;
+        left: -200px;
+        width: 3px;
+        height: 140%;
+        background: linear-gradient(180deg, transparent, rgba(238, 33, 36, .15), transparent);
+        transform: rotate(20deg);
+        animation: diagSweep 8s ease-in-out infinite
+      }
+
+      .hero-diag::after {
+        content: '';
+        position: absolute;
+        top: -100px;
+        right: -100px;
+        width: 1px;
+        height: 140%;
+        background: linear-gradient(180deg, transparent, rgba(238, 33, 36, .1), transparent);
+        transform: rotate(20deg);
+        animation: diagSweep 8s ease-in-out infinite 2s
+      }
+
+      @keyframes diagSweep {
+
+        0%,
+        100% {
+          opacity: 0.3
+        }
+
+        50% {
+          opacity: 1
+        }
+      }
+
+      .hero-content {
+        position: relative;
+        z-index: 10;
+        padding: 0 4%;
+        max-width: 1440px;
+        margin: 0 auto;
+        width: 100%;
+        display: grid;
+        grid-template-columns: 1.1fr .9fr;
+        gap: 40px;
+        align-items: center
+      }
+
+      .hero-eyebrow {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        margin-bottom: 24px;
+        opacity: 0;
+        animation: slideRight .8s ease .2s forwards
+      }
+
+      @keyframes slideRight {
+        from {
+          opacity: 0;
+          transform: translateX(-30px)
+        }
+
+        to {
+          opacity: 1;
+          transform: translateX(0)
+        }
+      }
+
+      .eyebrow-line {
+        height: 1px;
+        width: 50px;
+        background: linear-gradient(90deg, transparent, var(--red))
+      }
+
+      .eyebrow-text {
+        font-family: var(--mono);
+        font-size: 10px;
+        letter-spacing: 4px;
+        color: var(--red);
+        text-transform: uppercase
+      }
+
+      .eyebrow-dot {
+        width: 5px;
+        height: 5px;
+        background: var(--red);
+        border-radius: 50%;
+        animation: pulse 2s ease infinite
+      }
+
+      @keyframes pulse {
+
+        0%,
+        100% {
+          transform: scale(1);
+          opacity: 1
+        }
+
+        50% {
+          transform: scale(1.8);
+          opacity: .4
+        }
+      }
+
+      .hero-title {
+        font-family: var(--display);
+        font-weight: 900;
+        font-size: clamp(54px, 7.5vw, 96px);
+        line-height: .88;
+        text-transform: uppercase;
+        letter-spacing: -2px;
+        margin-bottom: 28px
+      }
+
+      .hero-title .line1 {
+        display: block;
+        opacity: 0;
+        animation: titleReveal .8s cubic-bezier(.16, 1, .3, 1) .3s forwards
+      }
+
+      .hero-title .line2 {
+        display: block;
+        color: var(--red);
+        opacity: 0;
+        animation: titleReveal .8s cubic-bezier(.16, 1, .3, 1) .45s forwards;
+        text-shadow: 0 0 60px rgba(238, 33, 36, .4)
+      }
+
+      .hero-title .line3 {
+        display: block;
+        -webkit-text-stroke: 1px rgba(255, 255, 255, .2);
+        color: transparent;
+        opacity: 0;
+        animation: titleReveal .8s cubic-bezier(.16, 1, .3, 1) .6s forwards
+      }
+
+      .hero-title .line4 {
+        display: block;
+        opacity: 0;
+        animation: titleReveal .8s cubic-bezier(.16, 1, .3, 1) .75s forwards
+      }
+
+      @keyframes titleReveal {
+        from {
+          opacity: 0;
+          transform: translateY(40px) skewY(3deg)
+        }
+
+        to {
+          opacity: 1;
+          transform: translateY(0) skewY(0)
+        }
+      }
+
+      .hero-desc {
+        font-size: 16px;
+        color: var(--gray-3);
+        max-width: 460px;
+        margin-bottom: 40px;
+        line-height: 1.8;
+        font-weight: 300;
+        opacity: 0;
+        animation: fadeUp .8s ease .9s forwards
+      }
+
+      @keyframes fadeUp {
+        from {
+          opacity: 0;
+          transform: translateY(20px)
+        }
+
+        to {
+          opacity: 1;
+          transform: translateY(0)
+        }
+      }
+
+      .hero-actions {
+        display: flex;
+        gap: 16px;
+        align-items: center;
+        flex-wrap: wrap;
+        opacity: 0;
+        animation: fadeUp .8s ease 1.1s forwards
+      }
+
+      .btn-primary {
+        background: var(--red);
+        color: var(--white);
+        font-family: var(--display);
+        font-weight: 700;
+        font-size: 14px;
+        letter-spacing: 2.5px;
+        text-transform: uppercase;
+        text-decoration: none;
+        padding: 15px 34px;
+        clip-path: polygon(12px 0, 100% 0, calc(100% - 12px) 100%, 0 100%);
+        transition: all .3s;
+        display: inline-block;
+        position: relative;
+        overflow: hidden;
+        box-shadow: 0 0 0 rgba(238, 33, 36, 0)
+      }
+
+      .btn-primary::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(90deg, transparent, rgba(255, 255, 255, .15), transparent);
+        transform: translateX(-100%);
+        transition: transform .5s
+      }
+
+      .btn-primary:hover::before {
+        transform: translateX(100%)
+      }
+
+      .btn-primary:hover {
+        box-shadow: 0 8px 40px rgba(238, 33, 36, .5);
+        transform: translateY(-2px)
+      }
+
+      .btn-secondary {
+        color: var(--gray-3);
+        font-family: var(--display);
+        font-weight: 600;
+        font-size: 12px;
+        letter-spacing: 2px;
+        text-transform: uppercase;
+        text-decoration: none;
+        padding: 15px 0;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        transition: color .2s
+      }
+
+      .btn-secondary svg {
+        width: 38px;
+        height: 38px;
+        transition: transform .3s
+      }
+
+      .btn-secondary:hover {
+        color: var(--white)
+      }
+
+      .btn-secondary:hover svg {
+        transform: scale(1.1)
+      }
+
+      .hero-stats {
+        display: flex;
+        gap: 0;
+        margin-top: 52px;
+        opacity: 0;
+        animation: fadeUp .8s ease 1.3s forwards;
+        border: 1px solid var(--border);
+        border-right: none;
+        width: fit-content
+      }
+
+      .stat {
+        padding: 18px 28px;
+        border-right: 1px solid var(--border);
+        position: relative
+      }
+
+      .stat::before {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        width: 0;
+        height: 2px;
+        background: var(--red);
+        transition: width .4s
+      }
+
+      .stat:hover::before {
+        width: 100%
+      }
+
+      .stat-num {
+        font-family: var(--display);
+        font-weight: 900;
+        font-size: 34px;
+        line-height: 1;
+        color: var(--white)
+      }
+
+      .stat-num sup {
+        color: var(--red);
+        font-size: 20px
+      }
+
+      .stat-lbl {
+        font-family: var(--mono);
+        font-size: 9px;
+        letter-spacing: 2px;
+        color: var(--gray-4);
+        text-transform: uppercase;
+        margin-top: 4px
+      }
+
+      /* ── HERO SCENE ── */
+      .hero-scene {
+        position: relative;
+        height: 540px;
+        opacity: 0;
+        animation: fadeIn 1.2s ease .5s forwards
+      }
+
+      @keyframes fadeIn {
+        to {
+          opacity: 1
+        }
+      }
+
+      .hero-scene-svg {
+        width: 100%;
+        height: 100%;
+        filter: drop-shadow(0 0 40px rgba(238, 33, 36, .08))
+      }
+
+      /* Floating UI cards */
+      .f-card {
+        position: absolute;
+        background: rgba(30, 27, 24, .92);
+        border: 1px solid rgba(238, 33, 36, .2);
+        border-left: 2px solid var(--red);
+        padding: 12px 16px;
+        backdrop-filter: blur(16px);
+        border-radius: 2px;
+        box-shadow: 0 8px 32px rgba(0, 0, 0, .5), inset 0 1px 0 rgba(255, 255, 255, .05)
+      }
+
+      .f-card-lbl {
+        font-family: var(--mono);
+        font-size: 8px;
+        letter-spacing: 3px;
+        color: var(--red);
+        text-transform: uppercase;
+        margin-bottom: 5px
+      }
+
+      .f-card-val {
+        font-family: var(--display);
+        font-weight: 800;
+        font-size: 20px;
+        color: var(--white);
+        line-height: 1
+      }
+
+      .f-card-sub {
+        font-family: var(--mono);
+        font-size: 9px;
+        color: var(--gray-4);
+        margin-top: 3px
+      }
+
+      .f-card.fc1 {
+        top: 4%;
+        right: 2%;
+        animation: float1 5s ease-in-out infinite
+      }
+
+      .f-card.fc2 {
+        bottom: 28%;
+        left: -8px;
+        animation: float2 6s ease-in-out infinite
+      }
+
+      .f-card.fc3 {
+        top: 38%;
+        right: -5px;
+        animation: float3 7s ease-in-out infinite
+      }
+
+      @keyframes float1 {
+
+        0%,
+        100% {
+          transform: translateY(0)
+        }
+
+        50% {
+          transform: translateY(-12px)
+        }
+      }
+
+      @keyframes float2 {
+
+        0%,
+        100% {
+          transform: translateY(0) rotate(-.5deg)
+        }
+
+        50% {
+          transform: translateY(-9px) rotate(.5deg)
+        }
+      }
+
+      @keyframes float3 {
+
+        0%,
+        100% {
+          transform: translateY(0)
+        }
+
+        33% {
+          transform: translateY(-14px)
+        }
+
+        66% {
+          transform: translateY(-6px)
+        }
+      }
+
+      /* Orbiting ring */
+      .orbit-ring {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        width: 300px;
+        height: 300px;
+        margin: -150px 0 0 -150px;
+        border: 1px solid rgba(238, 33, 36, .06);
+        border-radius: 50%;
+        animation: spinRing 20s linear infinite;
+        pointer-events: none
+      }
+
+      .orbit-ring::before {
+        content: '';
+        position: absolute;
+        top: -4px;
+        left: 50%;
+        width: 8px;
+        height: 8px;
+        background: var(--red);
+        border-radius: 50%;
+        transform: translateX(-50%);
+        box-shadow: 0 0 10px var(--red)
+      }
+
+      .orbit-ring2 {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        width: 200px;
+        height: 200px;
+        margin: -100px 0 0 -100px;
+        border: 1px solid rgba(238, 33, 36, .08);
+        border-radius: 50%;
+        animation: spinRing 12s linear infinite reverse;
+        pointer-events: none
+      }
+
+      .orbit-ring2::after {
+        content: '';
+        position: absolute;
+        bottom: -3px;
+        left: 50%;
+        width: 6px;
+        height: 6px;
+        background: rgba(238, 33, 36, .6);
+        border-radius: 50%;
+        transform: translateX(-50%);
+        box-shadow: 0 0 8px var(--red)
+      }
+
+      @keyframes spinRing {
+        from {
+          transform: rotate(0deg)
+        }
+
+        to {
+          transform: rotate(360deg)
+        }
+      }
+
+      /* ── TICKER ── */
+      .ticker {
+        background: var(--red);
+        overflow: hidden;
+        white-space: nowrap;
+        padding: 11px 0;
+        border-top: 1px solid rgba(255, 255, 255, .1);
+        border-bottom: 1px solid rgba(255, 255, 255, .1)
+      }
+
+      .ticker-track {
+        display: inline-flex;
+        animation: ticker 35s linear infinite
+      }
+
+      .ticker-item {
+        font-family: var(--mono);
+        font-size: 10px;
+        letter-spacing: 3px;
+        color: rgba(255, 255, 255, .9);
+        text-transform: uppercase;
+        padding: 0 36px;
+        display: flex;
+        align-items: center;
+        gap: 36px
+      }
+
+      .ticker-item::after {
+        content: '◆';
+        color: rgba(255, 255, 255, .4);
+        font-size: 7px
+      }
+
+      @keyframes ticker {
+        from {
+          transform: translateX(0)
+        }
+
+        to {
+          transform: translateX(-50%)
+        }
+      }
+
+      /* ── SECTIONS ── */
+      section {
+        padding: 110px 4%;
+        position: relative
+      }
+
+      .s-max {
+        max-width: 1440px;
+        margin: 0 auto
+      }
+
+      .s-label {
+        font-family: var(--mono);
+        font-size: 10px;
+        letter-spacing: 4px;
+        color: var(--red);
+        text-transform: uppercase;
+        margin-bottom: 14px;
+        display: flex;
+        align-items: center;
+        gap: 12px
+      }
+
+      .s-label::before {
+        content: '';
+        display: inline-block;
+        width: 28px;
+        height: 1px;
+        background: var(--red)
+      }
+
+      .s-title {
+        font-family: var(--display);
+        font-weight: 900;
+        font-size: clamp(38px, 5vw, 60px);
+        line-height: .95;
+        text-transform: uppercase;
+        letter-spacing: -1px
+      }
+
+      .s-desc {
+        color: var(--gray-3);
+        font-size: 16px;
+        font-weight: 300;
+        max-width: 520px;
+        line-height: 1.75;
+        margin-top: 16px
+      }
+
+      /* ── SERVICES ── */
+      .services {
+        background: var(--black-2)
+      }
+
+      .services-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-end;
+        margin-bottom: 64px;
+        gap: 32px;
+        flex-wrap: wrap
+      }
+
+      .services-grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 1px;
+        background: var(--border)
+      }
+
+      .svc {
+        background: var(--card-bg);
+        padding: 48px 36px;
+        position: relative;
+        overflow: hidden;
+        transition: background .3s;
+        cursor: none
+      }
+
+      .svc::after {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(135deg, rgba(238, 33, 36, .05) 0%, transparent 60%);
+        opacity: 0;
+        transition: opacity .4s
+      }
+
+      .svc:hover::after {
+        opacity: 1
+      }
+
+      .svc-line {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        width: 0;
+        height: 2px;
+        background: linear-gradient(90deg, var(--red), transparent);
+        transition: width .5s cubic-bezier(.16, 1, .3, 1)
+      }
+
+      .svc:hover .svc-line {
+        width: 100%
+      }
+
+      .svc:hover {
+        background: #252118
+      }
+
+      .svc-icon {
+        width: 54px;
+        height: 54px;
+        background: rgba(238, 33, 36, .08);
+        border: 1px solid rgba(238, 33, 36, .15);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 30px;
+        clip-path: polygon(8px 0, 100% 0, calc(100% - 8px) 100%, 0 100%);
+        transition: background .3s, transform .3s
+      }
+
+      .svc:hover .svc-icon {
+        background: rgba(238, 33, 36, .18);
+        transform: scale(1.05)
+      }
+
+      .svc-icon svg {
+        width: 26px;
+        height: 26px;
+        stroke: var(--red);
+        fill: none;
+        stroke-width: 1.5;
+        stroke-linecap: round;
+        stroke-linejoin: round
+      }
+
+      .svc-num {
+        font-family: var(--mono);
+        font-size: 9px;
+        letter-spacing: 3px;
+        color: var(--gray-4);
+        margin-bottom: 14px
+      }
+
+      .svc-name {
+        font-family: var(--display);
+        font-weight: 800;
+        font-size: 20px;
+        letter-spacing: .5px;
+        text-transform: uppercase;
+        margin-bottom: 14px;
+        line-height: 1.15
+      }
+
+      .svc-desc {
+        font-size: 13.5px;
+        color: var(--gray-3);
+        line-height: 1.7;
+        font-weight: 300
+      }
+
+      .svc-link {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin-top: 28px;
+        font-family: var(--display);
+        font-weight: 700;
+        font-size: 11px;
+        letter-spacing: 2.5px;
+        text-transform: uppercase;
+        color: var(--red);
+        text-decoration: none;
+        transition: gap .2s
+      }
+
+      .svc-link:hover {
+        gap: 16px
+      }
+
+      /* ── PRODUCTS ── */
+      .products {
+        background: var(--black-3)
+      }
+
+      .products-wrap {
+        display: grid;
+        grid-template-columns: 1fr 2fr;
+        gap: 64px;
+        align-items: start
+      }
+
+      .products-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 14px
+      }
+
+      .prod {
+        background: var(--card-bg);
+        border: 1px solid var(--border);
+        overflow: hidden;
+        position: relative;
+        transition: border-color .3s, transform .3s;
+        cursor: none
+      }
+
+      .prod:hover {
+        border-color: rgba(238, 33, 36, .3);
+        transform: translateY(-5px)
+      }
+
+      .prod:hover .prod-vis {
+        filter: grayscale(10%) brightness(.9)
+      }
+
+      .prod-vis {
+        width: 100%;
+        height: 170px;
+        display: block;
+        filter: grayscale(50%) brightness(.65);
+        transition: filter .5s;
+        object-fit: cover
+      }
+
+      /* SVG product visuals */
+      .prod-vis-svg {
+        width: 100%;
+        height: 170px;
+        display: block
+      }
+
+      .prod-tag {
+        font-family: var(--mono);
+        font-size: 8px;
+        letter-spacing: 3px;
+        color: var(--red);
+        margin-bottom: 8px;
+        text-transform: uppercase
+      }
+
+      .prod-name {
+        font-family: var(--display);
+        font-weight: 800;
+        font-size: 17px;
+        letter-spacing: .5px;
+        text-transform: uppercase;
+        margin-bottom: 8px
+      }
+
+      .prod-body {
+        padding: 20px 22px
+      }
+
+      .prod-desc {
+        font-size: 12.5px;
+        color: var(--gray-3);
+        line-height: 1.6;
+        font-weight: 300
+      }
+
+      .prod-feat {
+        grid-column: span 2;
+        display: grid;
+        grid-template-columns: 1fr 1fr
+      }
+
+      .prod-feat .prod-vis-svg,
+      .prod-feat .prod-vis-svg~div {
+        height: 220px
+      }
+
+      /* ── NUMBERS ── */
+      .numbers {
+        padding: 72px 4%;
+        background: var(--red);
+        position: relative;
+        overflow: hidden
+      }
+
+      .numbers::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        left: -10%;
+        width: 200px;
+        height: 200%;
+        background: rgba(255, 255, 255, .04);
+        transform: rotate(15deg)
+      }
+
+      .numbers::after {
+        content: '';
+        position: absolute;
+        top: -50%;
+        right: 10%;
+        width: 100px;
+        height: 200%;
+        background: rgba(255, 255, 255, .03);
+        transform: rotate(-20deg)
+      }
+
+      .numbers-grid {
+        max-width: 1440px;
+        margin: 0 auto;
+        display: grid;
+        grid-template-columns: repeat(4, 1fr)
+      }
+
+      .num-item {
+        text-align: center;
+        padding: 28px 20px;
+        position: relative
+      }
+
+      .num-item:not(:last-child)::after {
+        content: '';
+        position: absolute;
+        top: 20%;
+        right: 0;
+        height: 60%;
+        width: 1px;
+        background: rgba(255, 255, 255, .15)
+      }
+
+      .num-val {
+        font-family: var(--display);
+        font-weight: 900;
+        font-size: 62px;
+        line-height: 1;
+        color: #fff
+      }
+
+      .num-suf {
+        font-size: 32px;
+        vertical-align: super
+      }
+
+      .num-lbl {
+        font-family: var(--mono);
+        font-size: 9px;
+        letter-spacing: 3px;
+        color: rgba(255, 255, 255, .55);
+        text-transform: uppercase;
+        margin-top: 8px
+      }
+
+      /* ── PROJECTS ── */
+      .projects {
+        background: var(--black-2)
+      }
+
+      .proj-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-end;
+        margin-bottom: 56px;
+        flex-wrap: wrap;
+        gap: 20px
+      }
+
+      .proj-grid {
+        display: grid;
+        grid-template-columns: 2fr 1fr 1fr;
+        grid-template-rows: 290px 290px;
+        gap: 2px
+      }
+
+      .proj:first-child {
+        grid-row: span 2
+      }
+
+      .proj {
+        position: relative;
+        overflow: hidden;
+        cursor: none
+      }
+
+      .proj-bg {
+        position: absolute;
+        inset: 0;
+        transition: transform .7s cubic-bezier(.16, 1, .3, 1)
+      }
+
+      .proj:hover .proj-bg {
+        transform: scale(1.06)
+      }
+
+      .proj-overlay {
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(to top, rgba(12, 10, 8, .96) 0%, rgba(12, 10, 8, .2) 60%, transparent 100%);
+        transition: background .4s
+      }
+
+      .proj:hover .proj-overlay {
+        background: linear-gradient(to top, rgba(12, 10, 8, .99) 0%, rgba(12, 10, 8, .5) 60%, rgba(238, 33, 36, .05) 100%)
+      }
+
+      .proj-content {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        padding: 28px 26px
+      }
+
+      .proj-sector {
+        font-family: var(--mono);
+        font-size: 9px;
+        letter-spacing: 3px;
+        color: var(--red);
+        text-transform: uppercase;
+        margin-bottom: 8px
+      }
+
+      .proj-title {
+        font-family: var(--display);
+        font-weight: 800;
+        font-size: 21px;
+        text-transform: uppercase;
+        letter-spacing: .5px;
+        line-height: 1.15
+      }
+
+      .proj-meta {
+        display: flex;
+        gap: 14px;
+        margin-top: 10px;
+        font-family: var(--mono);
+        font-size: 9px;
+        color: var(--gray-4);
+        letter-spacing: 1px;
+        opacity: 0;
+        transform: translateY(8px);
+        transition: all .35s
+      }
+
+      .proj:hover .proj-meta {
+        opacity: 1;
+        transform: translateY(0)
+      }
+
+      .proj-arrow {
+        position: absolute;
+        top: 20px;
+        right: 20px;
+        width: 36px;
+        height: 36px;
+        background: rgba(238, 33, 36, 0);
+        border: 1px solid rgba(238, 33, 36, 0);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all .35s;
+        clip-path: polygon(6px 0, 100% 0, calc(100% - 6px) 100%, 0 100%)
+      }
+
+      .proj:hover .proj-arrow {
+        background: rgba(238, 33, 36, .15);
+        border-color: rgba(238, 33, 36, .5)
+      }
+
+      .proj-arrow svg {
+        width: 14px;
+        height: 14px;
+        stroke: var(--red);
+        fill: none;
+        stroke-width: 2
+      }
+
+      /* ── ABOUT ── */
+      .about {
+        background: var(--black-3)
+      }
+
+      .about-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 80px;
+        align-items: center
+      }
+
+      .about-visual {
+        position: relative
+      }
+
+      .about-frame {
+        position: relative;
+        overflow: visible
+      }
+
+      .about-frame::before {
+        content: '';
+        position: absolute;
+        top: -10px;
+        left: -10px;
+        right: 10px;
+        bottom: 10px;
+        border: 1.5px solid var(--red);
+        pointer-events: none;
+        z-index: 1
+      }
+
+      .about-frame::after {
+        content: '';
+        position: absolute;
+        top: 10px;
+        left: 10px;
+        right: -10px;
+        bottom: -10px;
+        border: 1px solid rgba(238, 33, 36, .2);
+        pointer-events: none;
+        z-index: 0
+      }
+
+      .about-frame svg {
+        width: 100%;
+        height: 420px;
+        display: block;
+        position: relative;
+        z-index: 0
+      }
+
+      .about-badge {
+        position: absolute;
+        bottom: -24px;
+        right: -24px;
+        width: 120px;
+        height: 120px;
+        background: var(--red);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        z-index: 10;
+        box-shadow: 0 0 60px rgba(238, 33, 36, .4)
+      }
+
+      .about-badge-n {
+        font-family: var(--display);
+        font-weight: 900;
+        font-size: 48px;
+        line-height: 1;
+        color: #fff
+      }
+
+      .about-badge-t {
+        font-family: var(--mono);
+        font-size: 8px;
+        letter-spacing: 2px;
+        color: rgba(255, 255, 255, .6);
+        text-align: center;
+        text-transform: uppercase
+      }
+
+      .about-list {
+        list-style: none;
+        display: flex;
+        flex-direction: column;
+        gap: 14px;
+        margin: 32px 0
+      }
+
+      .about-list li {
+        display: flex;
+        align-items: flex-start;
+        gap: 14px;
+        font-size: 14.5px;
+        color: var(--gray-2);
+        font-weight: 400;
+        line-height: 1.5
+      }
+
+      .about-list li::before {
+        content: '';
+        display: block;
+        width: 6px;
+        height: 6px;
+        background: var(--red);
+        flex-shrink: 0;
+        transform: rotate(45deg);
+        margin-top: 6px
+      }
+
+      .certs {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-top: 32px
+      }
+
+      .cert {
+        background: var(--card-bg);
+        border: 1px solid var(--border);
+        padding: 8px 16px;
+        font-family: var(--mono);
+        font-size: 9px;
+        letter-spacing: 2.5px;
+        color: var(--gray-3);
+        text-transform: uppercase;
+        transition: border-color .3s, color .3s
+      }
+
+      .cert:hover {
+        border-color: var(--red);
+        color: var(--white)
+      }
+
+      /* ── TESTIMONIALS ── */
+      .testimonials {
+        background: var(--black-2)
+      }
+
+      .testi-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 16px;
+        margin-top: 56px
+      }
+
+      .testi {
+        background: var(--card-bg);
+        border: 1px solid var(--border);
+        padding: 36px 32px;
+        position: relative;
+        overflow: hidden;
+        transition: border-color .3s, transform .3s
+      }
+
+      .testi:hover {
+        border-color: rgba(238, 33, 36, .2);
+        transform: translateY(-3px)
+      }
+
+      .testi-quote {
+        position: absolute;
+        top: 18px;
+        right: 24px;
+        font-family: var(--display);
+        font-size: 90px;
+        font-weight: 900;
+        color: rgba(238, 33, 36, .07);
+        line-height: 1;
+        pointer-events: none;
+        transition: color .3s
+      }
+
+      .testi:hover .testi-quote {
+        color: rgba(238, 33, 36, .12)
+      }
+
+      .testi-text {
+        font-size: 14px;
+        color: var(--gray-2);
+        line-height: 1.75;
+        font-weight: 300;
+        font-style: italic;
+        margin-bottom: 26px
+      }
+
+      .testi-author {
+        display: flex;
+        align-items: center;
+        gap: 12px
+      }
+
+      .testi-av {
+        width: 42px;
+        height: 42px;
+        background: var(--gray-5);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-family: var(--display);
+        font-weight: 700;
+        font-size: 15px;
+        color: var(--red);
+        flex-shrink: 0;
+        clip-path: polygon(5px 0, 100% 0, calc(100% - 5px) 100%, 0 100%)
+      }
+
+      .testi-name {
+        font-family: var(--display);
+        font-weight: 700;
+        font-size: 14px;
+        letter-spacing: 1px;
+        text-transform: uppercase
+      }
+
+      .testi-role {
+        font-family: var(--mono);
+        font-size: 9px;
+        color: var(--gray-4);
+        letter-spacing: 1px;
+        margin-top: 2px
+      }
+
+      /* ── CTA ── */
+      .cta-sec {
+        background: var(--black-3);
+        padding: 130px 4%;
+        text-align: center;
+        position: relative;
+        overflow: hidden
+      }
+
+      .cta-glow {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 700px;
+        height: 700px;
+        background: radial-gradient(circle, rgba(238, 33, 36, .08) 0%, transparent 70%);
+        pointer-events: none;
+        animation: glowPulse 4s ease infinite
+      }
+
+      @keyframes glowPulse {
+
+        0%,
+        100% {
+          transform: translate(-50%, -50%) scale(1)
+        }
+
+        50% {
+          transform: translate(-50%, -50%) scale(1.2)
+        }
+      }
+
+      .cta-lines {
+        position: absolute;
+        inset: 0;
+        overflow: hidden;
+        pointer-events: none
+      }
+
+      .cta-lines::before,
+      .cta-lines::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        height: 100%;
+        width: 1px;
+        background: linear-gradient(180deg, transparent, rgba(238, 33, 36, .15), transparent)
+      }
+
+      .cta-lines::before {
+        left: 20%
+      }
+
+      .cta-lines::after {
+        right: 20%
+      }
+
+      .cta-title {
+        font-family: var(--display);
+        font-weight: 900;
+        font-size: clamp(50px, 9vw, 100px);
+        text-transform: uppercase;
+        line-height: .88;
+        letter-spacing: -3px;
+        position: relative;
+        z-index: 1;
+        margin-bottom: 28px
+      }
+
+      .cta-title .outline {
+        -webkit-text-stroke: 1px rgba(255, 255, 255, .15);
+        color: transparent;
+        display: block
+      }
+
+      .cta-title .solid {
+        display: block
+      }
+
+      .cta-title .red {
+        color: var(--red);
+        display: block;
+        text-shadow: 0 0 80px rgba(238, 33, 36, .4)
+      }
+
+      .cta-desc {
+        font-size: 17px;
+        color: var(--gray-3);
+        max-width: 500px;
+        margin: 0 auto 48px;
+        font-weight: 300;
+        line-height: 1.75;
+        position: relative;
+        z-index: 1
+      }
+
+      .cta-actions {
+        display: flex;
+        gap: 16px;
+        justify-content: center;
+        flex-wrap: wrap;
+        position: relative;
+        z-index: 1
+      }
+
+      .btn-outline {
+        background: transparent;
+        border: 1px solid rgba(255, 255, 255, .15);
+        color: var(--gray-2);
+        font-family: var(--display);
+        font-weight: 700;
+        font-size: 14px;
+        letter-spacing: 2px;
+        text-transform: uppercase;
+        text-decoration: none;
+        padding: 15px 34px;
+        clip-path: polygon(12px 0, 100% 0, calc(100% - 12px) 100%, 0 100%);
+        transition: all .3s;
+        display: inline-block
+      }
+
+      .btn-outline:hover {
+        border-color: var(--red);
+        color: var(--red);
+        box-shadow: 0 0 30px rgba(238, 33, 36, .2)
+      }
+
+      /* ── FOOTER ── */
+      footer {
+        background: var(--black-2);
+        border-top: 1px solid var(--border);
+        padding: 64px 4% 32px
+      }
+
+      .footer-grid {
+        max-width: 1440px;
+        margin: 0 auto;
+        display: grid;
+        grid-template-columns: 2fr 1fr 1fr 1fr;
+        gap: 48px;
+        padding-bottom: 48px;
+        border-bottom: 1px solid var(--border)
+      }
+
+      .footer-logo {
+        margin-bottom: 18px
+      }
+
+      .footer-logo img {
+        height: 40px;
+        width: auto;
+        filter: brightness(0) invert(1);
+        opacity: .8
+      }
+
+      .footer-desc {
+        color: var(--gray-3);
+        font-size: 13.5px;
+        line-height: 1.7;
+        font-weight: 300;
+        max-width: 280px;
+        margin-bottom: 24px
+      }
+
+      .footer-contact {
+        display: flex;
+        flex-direction: column;
+        gap: 10px
+      }
+
+      .fc-item {
+        display: flex;
+        gap: 10px;
+        align-items: flex-start;
+        color: var(--gray-3);
+        font-size: 13px
+      }
+
+      .fc-item svg {
+        width: 14px;
+        height: 14px;
+        stroke: var(--red);
+        fill: none;
+        flex-shrink: 0;
+        margin-top: 3px
+      }
+
+      .f-heading {
+        font-family: var(--display);
+        font-weight: 700;
+        font-size: 12px;
+        letter-spacing: 3px;
+        text-transform: uppercase;
+        color: var(--white);
+        margin-bottom: 22px
+      }
+
+      .f-links {
+        list-style: none;
+        display: flex;
+        flex-direction: column;
+        gap: 11px
+      }
+
+      .f-links a {
+        text-decoration: none;
+        color: var(--gray-3);
+        font-size: 13.5px;
+        transition: color .2s, padding-left .2s;
+        font-weight: 300;
+        display: block
+      }
+
+      .f-links a:hover {
+        color: var(--red);
+        padding-left: 6px
+      }
+
+      .footer-bottom {
+        max-width: 1440px;
+        margin: 26px auto 0;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 16px
+      }
+
+      .f-copy {
+        font-family: var(--mono);
+        font-size: 9px;
+        letter-spacing: 2px;
+        color: var(--gray-4);
+        text-transform: uppercase
+      }
+
+      .f-socials {
+        display: flex;
+        gap: 10px
+      }
+
+      .f-socials a {
+        width: 34px;
+        height: 34px;
+        background: var(--gray-5);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-decoration: none;
+        transition: background .2s;
+        clip-path: polygon(5px 0, 100% 0, calc(100% - 5px) 100%, 0 100%)
+      }
+
+      .f-socials a:hover {
+        background: var(--red)
+      }
+
+      .f-socials svg {
+        width: 14px;
+        height: 14px;
+        stroke: var(--gray-2);
+        fill: none;
+        stroke-width: 1.5
+      }
+
+      /* ── SCROLL ANIMATIONS ── */
+      .reveal {
+        opacity: 0;
+        transform: translateY(36px);
+        transition: opacity .7s ease, transform .7s ease
+      }
+
+      .reveal.visible {
+        opacity: 1;
+        transform: translateY(0)
+      }
+
+      .reveal-left {
+        opacity: 0;
+        transform: translateX(-40px);
+        transition: opacity .7s ease, transform .7s ease
+      }
+
+      .reveal-left.visible {
+        opacity: 1;
+        transform: translateX(0)
+      }
+
+      .reveal-scale {
+        opacity: 0;
+        transform: scale(.93);
+        transition: opacity .7s ease, transform .7s ease
+      }
+
+      .reveal-scale.visible {
+        opacity: 1;
+        transform: scale(1)
+      }
+
+      /* ── MOBILE ── */
+      .mobile-nav {
+        display: none;
+        position: fixed;
+        top: 72px;
+        left: 0;
+        right: 0;
+        background: rgba(12, 10, 8, .98);
+        backdrop-filter: blur(20px);
+        border-bottom: 1px solid var(--border);
+        padding: 24px 4%;
+        z-index: 999;
+        flex-direction: column;
+        gap: 0
+      }
+
+      .mobile-nav.open {
+        display: flex
+      }
+
+      .mobile-nav a {
+        text-decoration: none;
+        color: var(--gray-3);
+        font-family: var(--display);
+        font-weight: 700;
+        font-size: 15px;
+        letter-spacing: 2px;
+        text-transform: uppercase;
+        padding: 14px 0;
+        border-bottom: 1px solid var(--border);
+        transition: color .2s, padding-left .2s
+      }
+
+      .mobile-nav a:hover {
+        color: var(--white);
+        padding-left: 8px
+      }
+
+      @media(max-width:1100px) {
+        .services-grid {
+          grid-template-columns: repeat(2, 1fr)
+        }
+
+        .numbers-grid {
+          grid-template-columns: repeat(2, 1fr)
+        }
+
+        .testi-grid .testi:last-child {
+          display: none
+        }
+      }
+
+      @media(max-width:900px) {
+        .hero-content {
+          grid-template-columns: 1fr
+        }
+
+        .hero-scene {
+          display: none
+        }
+
+        .products-wrap {
+          grid-template-columns: 1fr
+        }
+
+        .about-grid {
+          grid-template-columns: 1fr
+        }
+
+        .about-visual {
+          display: none
+        }
+
+        .proj-grid {
+          grid-template-columns: 1fr 1fr;
+          grid-template-rows: auto
+        }
+
+        .proj:first-child {
+          grid-row: auto;
+          grid-column: span 2
+        }
+
+        .footer-grid {
+          grid-template-columns: 1fr 1fr
+        }
+
+        .nav-links,
+        .nav-cta {
+          display: none
+        }
+
+        .hamburger {
+          display: flex
+        }
+
+        #cursor,
+        #cursor-ring {
+          display: none
+        }
+
+        body {
+          cursor: auto
+        }
+      }
+
+      @media(max-width:600px) {
+        section {
+          padding: 72px 4%
+        }
+
+        .services-grid {
+          grid-template-columns: 1fr
+        }
+
+        .products-grid {
+          grid-template-columns: 1fr
+        }
+
+        .prod-feat {
+          grid-column: auto;
+          grid-template-columns: 1fr
+        }
+
+        .proj-grid {
+          grid-template-columns: 1fr;
+          grid-template-rows: auto
+        }
+
+        .proj:first-child {
+          grid-column: auto
+        }
+
+        .numbers-grid {
+          grid-template-columns: 1fr 1fr
+        }
+
+        .testi-grid {
+          grid-template-columns: 1fr
+        }
+
+        .footer-grid {
+          grid-template-columns: 1fr
+        }
+
+        .hero-stats {
+          flex-wrap: wrap
+        }
+      }
+    </style>
+  </head>
+
+  <body>
+
+    <canvas id="particles-canvas"></canvas>
+    <div id="cursor"></div>
+    <div id="cursor-ring"></div>
+
+    <!-- ══ NAV ══ -->
+    <nav id="mainNav">
+      <a href="#" class="nav-logo">
+        <img src="logo.png" alt="PEP Arab Control Systems">
+      </a>
+      <ul class="nav-links">
+        <li><a href="#services">Services</a></li>
+        <li><a href="#products">Products</a></li>
+        <li><a href="#projects">Projects</a></li>
+        <li><a href="#about">About</a></li>
+        <li><a href="#contact" class="nav-cta">Request Quote</a></li>
+      </ul>
+      <div class="hamburger" onclick="toggleMenu()"><span></span><span></span><span></span></div>
+    </nav>
+
+    <div class="mobile-nav" id="mobileNav">
+      <a href="#services" onclick="toggleMenu()">Services</a>
+      <a href="#products" onclick="toggleMenu()">Products</a>
+      <a href="#projects" onclick="toggleMenu()">Projects</a>
+      <a href="#about" onclick="toggleMenu()">About</a>
+      <a href="#contact" onclick="toggleMenu()">Request Quote</a>
+    </div>
+
+    <!-- ══ HERO ══ -->
+    <section class="hero" id="home">
+      <div class="hero-bg"></div>
+      <div class="hero-grid"></div>
+      <div class="hero-diag"></div>
+
+      <div class="hero-content">
+        <div>
+          <div class="hero-eyebrow">
+            <div class="eyebrow-line"></div>
+            <span class="eyebrow-text">Industrial Automation & Control</span>
+            <div class="eyebrow-dot"></div>
+          </div>
+          <h1 class="hero-title">
+            <span class="line1">When</span>
+            <span class="line2">Failure</span>
+            <span class="line3">Is Not An</span>
+            <span class="line4">Option</span>
+          </h1>
+          <p class="hero-desc">PEP Arab delivers mission-critical automation for Marine, Oil &amp; Gas, Power
+            Infrastructure, and Industrial sectors — where precision and reliability are non-negotiable.</p>
+          <div class="hero-actions">
+            <a href="#contact" class="btn-primary">Request a Quote</a>
+            <a href="#projects" class="btn-secondary">
+              <svg viewBox="0 0 48 48" fill="none">
+                <circle cx="24" cy="24" r="22" stroke="rgba(238,33,36,0.4)" stroke-width="1.5" />
+                <circle cx="24" cy="24" r="22" stroke="rgba(238,33,36,0.8)" stroke-width="1.5" stroke-dasharray="138"
+                  stroke-dashoffset="70" style="animation:spinDash 6s linear infinite" />
+                <polygon points="20,17 20,31 32,24" fill="var(--red)" />
+              </svg>
+              View Projects
+            </a>
+          </div>
+          <div class="hero-stats">
+            <div class="stat">
+              <div class="stat-num">20<sup>+</sup></div>
+              <div class="stat-lbl">Years Exp.</div>
+            </div>
+            <div class="stat">
+              <div class="stat-num">500<sup>+</sup></div>
+              <div class="stat-lbl">Projects</div>
+            </div>
+            <div class="stat">
+              <div class="stat-num">99<sup>.7%</sup></div>
+              <div class="stat-lbl">Uptime SLA</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Hero scene -->
+        <div class="hero-scene">
+          <div class="orbit-ring"></div>
+          <div class="orbit-ring2"></div>
+          <svg class="hero-scene-svg" viewBox="0 0 560 520" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <radialGradient id="rg1" cx="50%" cy="50%">
+                <stop offset="0%" stop-color="#ee2124" stop-opacity=".12" />
+                <stop offset="100%" stop-color="#ee2124" stop-opacity="0" />
+              </radialGradient>
+              <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stop-color="#070504" />
+                <stop offset="100%" stop-color="#110e0b" />
+              </linearGradient>
+              <linearGradient id="water" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stop-color="#081018" />
+                <stop offset="100%" stop-color="#030810" />
+              </linearGradient>
+              <filter id="glow">
+                <feGaussianBlur stdDeviation="3" result="b" />
+                <feMerge>
+                  <feMergeNode in="b" />
+                  <feMergeNode in="SourceGraphic" />
+                </feMerge>
+              </filter>
+              <filter id="bigGlow">
+                <feGaussianBlur stdDeviation="8" result="b" />
+                <feMerge>
+                  <feMergeNode in="b" />
+                  <feMergeNode in="SourceGraphic" />
+                </feMerge>
+              </filter>
+            </defs>
+            <rect width="560" height="520" fill="url(#sky)" />
+            <!-- Stars -->
+            <g fill="white">
+              <circle cx="45" cy="25" r=".9" opacity=".6" />
+              <circle cx="130" cy="18" r="1.1" opacity=".5" />
+              <circle cx="220" cy="38" r=".8" opacity=".7" />
+              <circle cx="310" cy="14" r="1" opacity=".5" />
+              <circle cx="400" cy="30" r=".9" opacity=".6" />
+              <circle cx="490" cy="22" r="1.1" opacity=".4" />
+              <circle cx="75" cy="65" r=".7" opacity=".5" />
+              <circle cx="175" cy="58" r="1" opacity=".6" />
+              <circle cx="355" cy="48" r=".8" opacity=".5" />
+              <circle cx="465" cy="72" r=".9" opacity=".6" />
+              <circle cx="520" cy="45" r=".7" opacity=".4" />
+              <circle cx="15" cy="90" r=".8" opacity=".5" />
+            </g>
+            <!-- Horizon glow -->
+            <ellipse cx="280" cy="290" rx="280" ry="45" fill="url(#rg1)" />
+            <!-- POWER TOWER left -->
+            <g transform="translate(18,50)">
+              <polygon points="44,0 52,0 74,230 22,230" fill="#1e1a14" stroke="#2a2418" stroke-width=".5" />
+              <polygon points="44,0 52,0 32,230 64,230" fill="#191611" stroke="#2a2418" stroke-width=".5" />
+              <line x1="27" y1="45" x2="69" y2="45" stroke="#2a2418" stroke-width="1.5" />
+              <line x1="25" y1="90" x2="71" y2="90" stroke="#2a2418" stroke-width="1.5" />
+              <line x1="23" y1="135" x2="73" y2="135" stroke="#2a2418" stroke-width="1.5" />
+              <line x1="22" y1="175" x2="74" y2="175" stroke="#2a2418" stroke-width="1.5" />
+              <line x1="48" y1="15" x2="2" y2="55" stroke="#2a2418" stroke-width="2.5" />
+              <line x1="48" y1="15" x2="94" y2="55" stroke="#2a2418" stroke-width="2.5" />
+              <line x1="48" y1="45" x2="-5" y2="72" stroke="#2a2418" stroke-width="2" />
+              <line x1="48" y1="45" x2="101" y2="72" stroke="#2a2418" stroke-width="2" />
+              <path d="M -5,55 Q 48,75 101,55" fill="none" stroke="#161412" stroke-width="1.5" />
+              <path d="M -5,72 Q 48,92 101,72" fill="none" stroke="#161412" stroke-width="1.2" />
+              <circle cx="48" cy="6" r="3.5" fill="#ee2124" filter="url(#glow)">
+                <animate attributeName="opacity" values="1;.2;1" dur="2.2s" repeatCount="indefinite" />
+              </circle>
+            </g>
+            <!-- TOWER right -->
+            <g transform="translate(438,80)">
+              <polygon points="36,0 44,0 64,190 16,190" fill="#1e1a14" stroke="#2a2418" stroke-width=".5" />
+              <line x1="20" y1="38" x2="60" y2="38" stroke="#2a2418" stroke-width="1.5" />
+              <line x1="18" y1="76" x2="62" y2="76" stroke="#2a2418" stroke-width="1.5" />
+              <line x1="17" y1="115" x2="63" y2="115" stroke="#2a2418" stroke-width="1.5" />
+              <line x1="40" y1="14" x2="-2" y2="44" stroke="#2a2418" stroke-width="2" />
+              <line x1="40" y1="14" x2="82" y2="44" stroke="#2a2418" stroke-width="2" />
+              <circle cx="40" cy="4" r="3" fill="#ee2124" filter="url(#glow)">
+                <animate attributeName="opacity" values=".2;1;.2" dur="2.2s" repeatCount="indefinite" />
+              </circle>
+            </g>
+            <!-- DAM structure -->
+            <g transform="translate(290,160)">
+              <rect x="0" y="0" width="185" height="130" fill="#181510" rx="1" stroke="#252018" stroke-width=".5" />
+              <rect x="0" y="0" width="185" height="7" fill="#22200e" />
+              <rect x="8" y="18" width="28" height="100" fill="#121008" stroke="#221e10" stroke-width=".5" />
+              <rect x="42" y="18" width="28" height="100" fill="#121008" stroke="#221e10" stroke-width=".5" />
+              <rect x="76" y="18" width="28" height="100" fill="#121008" stroke="#221e10" stroke-width=".5" />
+              <rect x="110" y="18" width="28" height="100" fill="#121008" stroke="#221e10" stroke-width=".5" />
+              <rect x="144" y="18" width="33" height="100" fill="#121008" stroke="#221e10" stroke-width=".5" />
+              <line x1="8" y1="65" x2="36" y2="65" stroke="#221e10" stroke-width="1" />
+              <line x1="42" y1="65" x2="70" y2="65" stroke="#221e10" stroke-width="1" />
+              <line x1="76" y1="65" x2="104" y2="65" stroke="#221e10" stroke-width="1" />
+              <line x1="110" y1="65" x2="138" y2="65" stroke="#221e10" stroke-width="1" />
+              <rect x="58" y="-35" width="68" height="35" fill="#1c1910" stroke="#252018" stroke-width=".5" />
+              <rect x="70" y="-28" width="10" height="9" fill="#0c1a28" opacity=".8" />
+              <rect x="88" y="-28" width="10" height="9" fill="#0c2838" opacity=".7" />
+              <rect x="106" y="-28" width="10" height="9" fill="#0c1a28" opacity=".8" />
+              <circle cx="58" cy="-37" r="2.5" fill="#ee2124" filter="url(#glow)">
+                <animate attributeName="opacity" values="1;.2;1" dur="1.8s" repeatCount="indefinite" />
+              </circle>
+              <circle cx="126" cy="-37" r="2.5" fill="#ee2124" filter="url(#glow)">
+                <animate attributeName="opacity" values=".2;1;.2" dur="1.8s" repeatCount="indefinite" />
+              </circle>
+              <!-- Water spill animation -->
+              <path d="M 8,118 Q 22,130 36,118" fill="none" stroke="rgba(30,80,120,.5)" stroke-width="2">
+                <animate attributeName="d"
+                  values="M 8,118 Q 22,130 36,118;M 8,120 Q 22,118 36,120;M 8,118 Q 22,130 36,118" dur="1.5s"
+                  repeatCount="indefinite" />
+              </path>
+              <path d="M 42,118 Q 56,130 70,118" fill="none" stroke="rgba(30,80,120,.4)" stroke-width="2">
+                <animate attributeName="d"
+                  values="M 42,118 Q 56,130 70,118;M 42,120 Q 56,118 70,120;M 42,118 Q 56,130 70,118" dur="2s"
+                  repeatCount="indefinite" />
+              </path>
+            </g>
+            <!-- Water surface -->
+            <rect x="0" y="300" width="560" height="220" fill="url(#water)" />
+            <!-- Water ripple -->
+            <path d="M 0,310 Q 70,305 140,311 Q 210,317 280,310 Q 350,303 420,311 Q 490,318 560,310" fill="none"
+              stroke="rgba(30,80,120,.3)" stroke-width="1">
+              <animate attributeName="d"
+                values="M 0,310 Q 70,305 140,311 Q 210,317 280,310 Q 350,303 420,311 Q 490,318 560,310;M 0,312 Q 70,318 140,310 Q 210,304 280,312 Q 350,320 420,310 Q 490,304 560,312;M 0,310 Q 70,305 140,311 Q 210,317 280,310 Q 350,303 420,311 Q 490,318 560,310"
+                dur="4s" repeatCount="indefinite" />
+            </path>
+            <path d="M 0,330 Q 90,324 180,332 Q 270,338 360,330 Q 450,323 560,330" fill="none"
+              stroke="rgba(30,80,120,.2)" stroke-width=".8">
+              <animate attributeName="d"
+                values="M 0,330 Q 90,324 180,332 Q 270,338 360,330 Q 450,323 560,330;M 0,332 Q 90,338 180,330 Q 270,322 360,332 Q 450,340 560,332;M 0,330 Q 90,324 180,332 Q 270,338 360,330 Q 450,323 560,330"
+                dur="5s" repeatCount="indefinite" />
+            </path>
+            <!-- OIL PLATFORM -->
+            <g transform="translate(88,185)">
+              <line x1="20" y1="0" x2="10" y2="115" stroke="#2a2218" stroke-width="3.5" />
+              <line x1="65" y1="0" x2="75" y2="115" stroke="#2a2218" stroke-width="3.5" />
+              <line x1="42" y1="0" x2="42" y2="115" stroke="#2a2218" stroke-width="2.5" />
+              <line x1="12" y1="32" x2="73" y2="52" stroke="#2a2218" stroke-width="1" />
+              <line x1="73" y1="32" x2="12" y2="52" stroke="#2a2218" stroke-width="1" />
+              <line x1="11" y1="72" x2="74" y2="92" stroke="#2a2218" stroke-width="1" />
+              <line x1="74" y1="72" x2="11" y2="92" stroke="#2a2218" stroke-width="1" />
+              <rect x="0" y="-12" width="86" height="12" fill="#221e14" stroke="#2a2418" stroke-width=".5" />
+              <rect x="5" y="-34" width="22" height="22" fill="#191610" stroke="#252018" stroke-width=".5" />
+              <rect x="33" y="-40" width="18" height="28" fill="#161510" stroke="#252018" stroke-width=".5" />
+              <rect x="57" y="-28" width="22" height="16" fill="#1c1a10" stroke="#252018" stroke-width=".5" />
+              <line x1="77" y1="-12" x2="77" y2="-68" stroke="#2a2418" stroke-width="2.5" />
+              <ellipse cx="77" cy="-71" rx="5" ry="9" fill="#ee2124" filter="url(#bigGlow)">
+                <animate attributeName="ry" values="9;16;9" dur=".9s" repeatCount="indefinite" />
+                <animate attributeName="opacity" values=".9;.5;.9" dur=".9s" repeatCount="indefinite" />
+              </ellipse>
+            </g>
+            <!-- SHIP animating -->
+            <g>
+              <animateTransform attributeName="transform" type="translate" values="-210,260;610,260" dur="25s"
+                repeatCount="indefinite" begin="0s" />
+              <polygon points="0,48 190,48 202,65 -12,65" fill="#0d1318" stroke="#1a2228" stroke-width="1" />
+              <rect x="8" y="16" width="130" height="32" fill="#0f1620" stroke="#1a2228" stroke-width=".5" />
+              <rect x="62" y="-24" width="58" height="40" fill="#0d1318" stroke="#1a2228" stroke-width=".5" />
+              <rect x="74" y="-44" width="34" height="20" fill="#0a1014" stroke="#1a2228" stroke-width=".5" />
+              <rect x="78" y="-56" width="26" height="12" fill="#0d1318" stroke="#1a2228" stroke-width=".5" />
+              <rect x="79" y="-40" width="6" height="7" fill="#0c1e30" opacity=".9" />
+              <rect x="89" y="-40" width="6" height="7" fill="#0c2838" opacity=".9" />
+              <rect x="99" y="-40" width="6" height="7" fill="#0c1e30" opacity=".8" />
+              <rect x="65" y="-17" width="6" height="5" fill="#0a1e28" />
+              <rect x="75" y="-17" width="6" height="5" fill="#0c2838" />
+              <rect x="85" y="-17" width="6" height="5" fill="#0c2838" />
+              <rect x="95" y="-17" width="6" height="5" fill="#0a1e28" />
+              <line x1="28" y1="16" x2="28" y2="-30" stroke="#1a2228" stroke-width="2.5" />
+              <line x1="28" y1="-30" x2="62" y2="-18" stroke="#1a2228" stroke-width="2" />
+              <line x1="91" y1="-56" x2="91" y2="-72" stroke="#1a2228" stroke-width="2" />
+              <line x1="80" y1="-68" x2="102" y2="-68" stroke="#1a2228" stroke-width="1.5" />
+              <line x1="150" y1="48" x2="165" y2="16" stroke="#1a2228" stroke-width="2" />
+              <line x1="165" y1="16" x2="195" y2="20" stroke="#1a2228" stroke-width="1.5" />
+              <circle cx="195" cy="50" r="3" fill="#ee2124" filter="url(#glow)">
+                <animate attributeName="opacity" values="1;.2;1" dur="1.4s" repeatCount="indefinite" />
+              </circle>
+              <circle cx="0" cy="50" r="3" fill="#22c55e" filter="url(#glow)">
+                <animate attributeName="opacity" values=".2;1;.2" dur="1.4s" repeatCount="indefinite" />
+              </circle>
+              <path d="M -12,65 Q 95,80 202,65" fill="rgba(20,60,80,.25)" stroke="rgba(30,80,100,.3)"
+                stroke-width="1" />
+            </g>
+            <!-- Corner HUD -->
+            <g stroke="rgba(238,33,36,.35)" stroke-width="1.5" fill="none">
+              <path d="M 6,6 L 6,22 M 6,6 L 22,6" />
+              <path d="M 554,6 L 538,6 M 554,6 L 554,22" />
+              <path d="M 6,514 L 6,498 M 6,514 L 22,514" />
+              <path d="M 554,514 L 538,514 M 554,514 L 554,498" />
+            </g>
+            <g font-family="'Share Tech Mono',monospace" fill="rgba(238,33,36,.4)" font-size="8">
+              <text x="8" y="510">SYS:ACTIVE</text><text x="200" y="510">NODES:14/14</text><text x="400"
+                y="510">v4.2.1-STABLE</text>
+            </g>
+            <!-- Scan line -->
+            <line x1="0" y1="0" x2="560" y2="0" stroke="rgba(238,33,36,.12)" stroke-width="1.5">
+              <animate attributeName="y1" values="0;520;0" dur="9s" repeatCount="indefinite" />
+              <animate attributeName="y2" values="0;520;0" dur="9s" repeatCount="indefinite" />
+            </line>
+          </svg>
+          <!-- Floating cards -->
+          <div class="f-card fc1">
+            <div class="f-card-lbl">System Status</div>
+            <div class="f-card-val" style="color:#22c55e;font-size:13px">● ALL SYSTEMS ONLINE</div>
+            <div class="f-card-sub">14 active nodes · 0 alarms</div>
+          </div>
+          <div class="f-card fc2">
+            <div class="f-card-lbl">SCADA Uptime</div>
+            <div class="f-card-val">99.7%</div>
+            <div class="f-card-sub">Last 365 days</div>
+          </div>
+          <div class="f-card fc3">
+            <div class="f-card-lbl">Response Time</div>
+            <div class="f-card-val">&lt;2ms</div>
+            <div class="f-card-sub">Real-time control loop</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ══ TICKER ══ -->
+    <div class="ticker">
+      <div class="ticker-track">
+        <span class="ticker-item">PLC Programming</span><span class="ticker-item">SCADA Systems</span><span
+          class="ticker-item">Marine Automation</span><span class="ticker-item">Oil &amp; Gas Control</span><span
+          class="ticker-item">LV Power Distribution</span><span class="ticker-item">HMI Design</span><span
+          class="ticker-item">MCC Panels</span><span class="ticker-item">Safety Systems SIL</span><span
+          class="ticker-item">Control Room Engineering</span><span class="ticker-item">Industrial Training</span><span
+          class="ticker-item">PLC Programming</span><span class="ticker-item">SCADA Systems</span><span
+          class="ticker-item">Marine Automation</span><span class="ticker-item">Oil &amp; Gas Control</span><span
+          class="ticker-item">LV Power Distribution</span><span class="ticker-item">HMI Design</span><span
+          class="ticker-item">MCC Panels</span><span class="ticker-item">Safety Systems SIL</span><span
+          class="ticker-item">Control Room Engineering</span><span class="ticker-item">Industrial Training</span>
+      </div>
+    </div>
+
+    <!-- ══ SERVICES ══ -->
+    <section class="services" id="services">
+      <div class="s-max">
+        <div class="services-header">
+          <div>
+            <div class="s-label reveal">What We Do</div>
+            <h2 class="s-title reveal">Core <span style="color:var(--red)">Services</span></h2>
+          </div>
+          <p class="s-desc reveal">End-to-end engineering from design and integration to commissioning, maintenance, and
+            operator training across all critical industries.</p>
+        </div>
+        <div class="services-grid">
+          <div class="svc reveal">
+            <div class="svc-line"></div>
+            <div class="svc-icon"><svg viewBox="0 0 24 24">
+                <rect x="2" y="3" width="20" height="14" rx="1.5" />
+                <line x1="8" y1="21" x2="16" y2="21" />
+                <line x1="12" y1="17" x2="12" y2="21" />
+                <circle cx="12" cy="10" r="2.5" />
+                <path d="M9.5 10H7M17 10h-2.5" />
+              </svg></div>
+            <div class="svc-num">01 / 04</div>
+            <div class="svc-name">Industrial Control Systems</div>
+            <p class="svc-desc">PLC programming, SCADA integration, HMI design, and DCS implementation for
+              manufacturing, utilities, and process industries.</p>
+            <a href="#contact" class="svc-link">Learn More →</a>
+          </div>
+          <div class="svc reveal" style="transition-delay:.1s">
+            <div class="svc-line"></div>
+            <div class="svc-icon"><svg viewBox="0 0 24 24">
+                <path d="M3 17l4-8 4 4 3-6 4 10" />
+                <ellipse cx="12" cy="20" rx="9" ry="2" />
+              </svg></div>
+            <div class="svc-num">02 / 04</div>
+            <div class="svc-name">Marine &amp; Offshore Systems</div>
+            <p class="svc-desc">Vessel automation, dynamic positioning, ballast control, engine room monitoring, and
+              offshore platform control systems.</p>
+            <a href="#contact" class="svc-link">Learn More →</a>
+          </div>
+          <div class="svc reveal" style="transition-delay:.2s">
+            <div class="svc-line"></div>
+            <div class="svc-icon"><svg viewBox="0 0 24 24">
+                <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" />
+              </svg></div>
+            <div class="svc-num">03 / 04</div>
+            <div class="svc-name">LV Power Infrastructure</div>
+            <p class="svc-desc">MCC design, power distribution panels, switchgear integration, motor protection, and
+              electrical control systems for critical facilities.</p>
+            <a href="#contact" class="svc-link">Learn More →</a>
+          </div>
+          <div class="svc reveal" style="transition-delay:.3s">
+            <div class="svc-line"></div>
+            <div class="svc-icon"><svg viewBox="0 0 24 24">
+                <path d="M22 10v6M2 10l10-5 10 5-10 5-10-5z" />
+                <path d="M6 12v5c3 3 9 3 12 0v-5" />
+              </svg></div>
+            <div class="svc-num">04 / 04</div>
+            <div class="svc-name">Technical Training</div>
+            <p class="svc-desc">Certified programs in PLC, SCADA, instrumentation, and industrial safety for engineers
+              and operations teams.</p>
+            <a href="#contact" class="svc-link">Learn More →</a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ══ PRODUCTS ══ -->
+    <section class="products" id="products">
+      <div class="s-max">
+        <div class="products-wrap">
+          <div>
+            <div class="s-label reveal">Hardware &amp; Software</div>
+            <h2 class="s-title reveal">Industrial <span style="color:var(--red)">Products</span></h2>
+            <p class="s-desc reveal">Factory-authorized supply, integration, and lifetime support for industry-leading
+              automation hardware and software.</p>
+            <div style="margin-top:36px" class="reveal"><a href="#contact" class="btn-primary">Request Product Info</a>
+            </div>
+            <ul class="about-list reveal" style="margin-top:36px">
+              <li>Factory-authorized distribution &amp; reseller</li>
+              <li>Complete engineering integration &amp; commissioning</li>
+              <li>Multi-vendor: Siemens · Rockwell · Schneider</li>
+              <li>24/7 emergency technical support</li>
+            </ul>
+          </div>
+          <div class="products-grid">
+            <div class="prod prod-feat reveal">
+              <svg class="prod-vis-svg" viewBox="0 0 420 220" xmlns="http://www.w3.org/2000/svg" style="height:220px">
+                <rect width="420" height="220" fill="#0e0c0a" />
+                <rect x="50" y="25" width="320" height="160" rx="4" fill="#161310" stroke="#222018" stroke-width="1" />
+                <rect x="62" y="36" width="200" height="130" rx="2" fill="#0c0b08" stroke="#1e1c14" stroke-width=".5" />
+                <g stroke="#142814" stroke-width=".8" fill="none" opacity=".7">
+                  <line x1="70" y1="55" x2="145" y2="55" />
+                  <line x1="145" y1="55" x2="145" y2="90" />
+                  <line x1="145" y1="90" x2="200" y2="90" />
+                  <line x1="70" y1="78" x2="125" y2="78" />
+                  <line x1="125" y1="78" x2="125" y2="130" />
+                  <line x1="70" y1="100" x2="165" y2="100" />
+                  <line x1="165" y1="100" x2="165" y2="65" />
+                  <line x1="70" y1="124" x2="195" y2="124" />
+                  <line x1="195" y1="124" x2="195" y2="82" />
+                  <line x1="70" y1="145" x2="240" y2="145" />
+                  <line x1="240" y1="145" x2="240" y2="90" />
+                </g>
+                <rect x="88" y="57" width="28" height="18" rx="1" fill="#0e2010" stroke="#1e3818" stroke-width=".5" />
+                <rect x="142" y="72" width="24" height="17" rx="1" fill="#0e2010" stroke="#1e3818" stroke-width=".5" />
+                <rect x="165" y="84" width="34" height="20" rx="1" fill="#0e2010" stroke="#1e3818" stroke-width=".5" />
+                <rect x="95" y="106" width="38" height="24" rx="1" fill="#0e2010" stroke="#1e3818" stroke-width=".5" />
+                <rect x="155" y="112" width="28" height="20" rx="1" fill="#0e2010" stroke="#1e3818" stroke-width=".5" />
+                <g>
+                  <circle cx="285" cy="50" r="4.5" fill="#22c55e">
+                    <animate attributeName="opacity" values="1;.3;1" dur="2s" repeatCount="indefinite" />
+                  </circle>
+                  <circle cx="302" cy="50" r="4.5" fill="#ee2124">
+                    <animate attributeName="opacity" values=".3;1;.3" dur="1.6s" repeatCount="indefinite" />
+                  </circle>
+                  <circle cx="319" cy="50" r="4.5" fill="#3b82f6">
+                    <animate attributeName="opacity" values="1;.4;1" dur="3s" repeatCount="indefinite" />
+                  </circle>
+                  <circle cx="336" cy="50" r="4.5" fill="#f59e0b">
+                    <animate attributeName="opacity" values=".5;1;.5" dur="2.5s" repeatCount="indefinite" />
+                  </circle>
+                </g>
+                <rect x="272" y="72" width="90" height="11" rx="1" fill="#0c0b08" stroke="#1e1c14" stroke-width=".5" />
+                <rect x="272" y="88" width="90" height="11" rx="1" fill="#0c0b08" stroke="#1e1c14" stroke-width=".5" />
+                <rect x="272" y="104" width="90" height="11" rx="1" fill="#0c0b08" stroke="#1e1c14" stroke-width=".5" />
+                <rect x="272" y="120" width="90" height="11" rx="1" fill="#0c0b08" stroke="#1e1c14" stroke-width=".5" />
+                <rect x="272" y="136" width="90" height="11" rx="1" fill="#0c0b08" stroke="#1e1c14" stroke-width=".5" />
+                <text x="210" y="205" text-anchor="middle" font-family="'Share Tech Mono',monospace" font-size="9"
+                  fill="rgba(238,33,36,.45)" letter-spacing="3">PLC CONTROLLER MODULE</text>
+              </svg>
+              <div class="prod-body">
+                <div class="prod-tag">Siemens · Allen-Bradley · Schneider</div>
+                <div class="prod-name">Programmable Logic Controllers</div>
+                <p class="prod-desc">High-reliability PLCs for discrete, process, and safety applications. Full
+                  programming, commissioning, and integration support.</p>
+              </div>
+            </div>
+            <div class="prod reveal" style="transition-delay:.15s">
+              <svg class="prod-vis-svg" viewBox="0 0 200 170" xmlns="http://www.w3.org/2000/svg">
+                <rect width="200" height="170" fill="#080d18" />
+                <rect x="8" y="8" width="184" height="130" rx="2" fill="#06090f" stroke="#121e2e" stroke-width="1" />
+                <rect x="12" y="12" width="176" height="16" fill="#0a1220" stroke="#12203a" stroke-width=".5" />
+                <text x="14" y="23" font-family="monospace" font-size="7" fill="rgba(238,33,36,.7)"
+                  letter-spacing="1">SCADA ● LIVE OVERVIEW</text>
+                <polyline points="15,110 38,88 55,98 78,68 98,80 122,55 148,70 168,48 185,62" fill="none"
+                  stroke="#ee2124" stroke-width="1.5" opacity=".8" />
+                <polyline points="15,118 38,112 55,116 78,108 98,112 122,102 148,108 168,96 185,100" fill="none"
+                  stroke="#3b82f6" stroke-width="1" opacity=".5" />
+                <circle cx="26" cy="56" r="12" fill="none" stroke="#1e2e3e" stroke-width="2" />
+                <path d="M 26,56 L 26,46" stroke="#22c55e" stroke-width="2" stroke-linecap="round" />
+                <circle cx="58" cy="56" r="12" fill="none" stroke="#1e2e3e" stroke-width="2" />
+                <path d="M 58,56 L 62,46" stroke="#ee2124" stroke-width="2" stroke-linecap="round" />
+                <circle cx="90" cy="56" r="12" fill="none" stroke="#1e2e3e" stroke-width="2" />
+                <path d="M 90,56 L 90,45" stroke="#3b82f6" stroke-width="2" stroke-linecap="round" />
+                <text x="100" y="155" text-anchor="middle" font-family="monospace" font-size="7"
+                  fill="rgba(26,80,100,.7)" letter-spacing="2">IGNITION · WINCC · CITECT</text>
+              </svg>
+              <div class="prod-body">
+                <div class="prod-tag">SCADA / HMI</div>
+                <div class="prod-name">Supervisory Control</div>
+                <p class="prod-desc">Real-time monitoring, data acquisition, and visualization for complex industrial
+                  processes.</p>
+              </div>
+            </div>
+            <div class="prod reveal" style="transition-delay:.3s">
+              <svg class="prod-vis-svg" viewBox="0 0 200 170" xmlns="http://www.w3.org/2000/svg">
+                <rect width="200" height="170" fill="#100e0a" />
+                <rect x="50" y="18" width="100" height="84" rx="5" fill="#0e0c08" stroke="#1e1c14" stroke-width="1.5" />
+                <rect x="56" y="24" width="88" height="72" rx="2" fill="#08090e" />
+                <rect x="58" y="26" width="84" height="14" fill="#0c1218" />
+                <text x="100" y="36" text-anchor="middle" font-family="monospace" font-size="6" fill="#22c55e"
+                  letter-spacing="1">CONTROL v2.4</text>
+                <rect x="60" y="44" width="24" height="20" fill="#0a1410" stroke="#142814" stroke-width=".5" rx="1" />
+                <rect x="88" y="44" width="24" height="20" fill="#0a1410" stroke="#142814" stroke-width=".5" rx="1" />
+                <rect x="116" y="44" width="24" height="20" fill="#0a1410" stroke="#142814" stroke-width=".5" rx="1" />
+                <text x="72" y="58" text-anchor="middle" font-family="monospace" font-size="7" fill="#22c55e">87%</text>
+                <text x="100" y="58" text-anchor="middle" font-family="monospace" font-size="7"
+                  fill="#ee2124">92%</text>
+                <text x="128" y="58" text-anchor="middle" font-family="monospace" font-size="7"
+                  fill="#3b82f6">74%</text>
+                <circle cx="72" cy="82" r="6" fill="#0e1a10" stroke="#22c55e" stroke-width="1" />
+                <circle cx="100" cy="82" r="6" fill="#1a0e0e" stroke="#ee2124" stroke-width="1" />
+                <circle cx="128" cy="82" r="6" fill="#0e1018" stroke="#3b82f6" stroke-width="1" />
+                <rect x="88" y="102" width="24" height="8" fill="#161410" stroke="#221e14" stroke-width=".5" />
+                <rect x="72" y="110" width="56" height="6" rx="1" fill="#1a1814" stroke="#222018" stroke-width=".5" />
+                <text x="100" y="155" text-anchor="middle" font-family="monospace" font-size="7"
+                  fill="rgba(238,100,36,.4)" letter-spacing="2">PANEL PC · IPC · HMI</text>
+              </svg>
+              <div class="prod-body">
+                <div class="prod-tag">IPC / Panel PCs</div>
+                <div class="prod-name">Industrial Computers</div>
+                <p class="prod-desc">Ruggedized panel PCs and touch HMIs rated for harsh industrial environments and
+                  extreme conditions.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ══ NUMBERS ══ -->
+    <div class="numbers">
+      <div class="numbers-grid">
+        <div class="num-item reveal">
+          <div class="num-val"><span class="counter" data-target="500">0</span><span class="num-suf">+</span></div>
+          <div class="num-lbl">Projects Completed</div>
+        </div>
+        <div class="num-item reveal" style="transition-delay:.1s">
+          <div class="num-val"><span class="counter" data-target="20">0</span><span class="num-suf">+</span></div>
+          <div class="num-lbl">Years of Expertise</div>
+        </div>
+        <div class="num-item reveal" style="transition-delay:.2s">
+          <div class="num-val"><span class="counter" data-target="50">0</span><span class="num-suf">+</span></div>
+          <div class="num-lbl">Global Clients</div>
+        </div>
+        <div class="num-item reveal" style="transition-delay:.3s">
+          <div class="num-val">99<span class="num-suf">.7%</span></div>
+          <div class="num-lbl">System Uptime SLA</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ PROJECTS ══ -->
+    <section class="projects" id="projects">
+      <div class="s-max">
+        <div class="proj-header">
+          <div>
+            <div class="s-label reveal">Case Studies</div>
+            <h2 class="s-title reveal">Selected <span style="color:var(--red)">Projects</span></h2>
+          </div>
+          <a href="#contact" class="btn-outline reveal">View All Projects</a>
+        </div>
+        <div class="proj-grid reveal">
+          <div class="proj">
+            <div class="proj-bg" style="background:#070e18;">
+              <svg width="100%" height="100%" viewBox="0 0 400 580" preserveAspectRatio="xMidYMid slice"
+                xmlns="http://www.w3.org/2000/svg">
+                <rect width="400" height="580" fill="#050c14" />
+                <rect x="0" y="360" width="400" height="220" fill="#03080f" />
+                <rect x="20" y="290" width="360" height="80" rx="4" fill="#08111c" stroke="#101e2c" stroke-width="1" />
+                <polygon points="20,290 380,290 400,370 0,370" fill="#060e18" stroke="#101e2c" stroke-width="1" />
+                <rect x="55" y="230" width="125" height="60" fill="#08111c" stroke="#101e2c" stroke-width=".5" />
+                <rect x="75" y="195" width="85" height="35" fill="#060e18" stroke="#101e2c" stroke-width=".5" />
+                <rect x="85" y="178" width="65" height="17" fill="#08111c" stroke="#101e2c" stroke-width=".5" />
+                <rect x="248" y="295" width="4" height="120" fill="#101e2c" />
+                <line x1="250" y1="300" x2="330" y2="310" stroke="#101e2c" stroke-width="2.5" />
+                <line x1="290" y1="295" x2="290" y2="230" stroke="#101e2c" stroke-width="3" />
+                <line x1="290" y1="238" x2="358" y2="246" stroke="#101e2c" stroke-width="2" />
+                <line x1="358" y1="290" x2="358" y2="180" stroke="#101e2c" stroke-width="2.5" />
+                <ellipse cx="358" cy="176" rx="6" ry="11" fill="#ee2124" filter="url(#bigGlow)">
+                  <animate attributeName="ry" values="11;18;11" dur="1s" repeatCount="indefinite" />
+                </ellipse>
+                <g fill="#0c2438" opacity=".9">
+                  <rect x="79" y="196" width="7" height="7" />
+                  <rect x="90" y="196" width="7" height="7" />
+                  <rect x="101" y="196" width="7" height="7" />
+                  <rect x="112" y="196" width="7" height="7" />
+                </g>
+                <circle cx="378" cy="298" r="3.5" fill="#ee2124">
+                  <animate attributeName="opacity" values="1;0;1" dur="1.4s" repeatCount="indefinite" />
+                </circle>
+                <circle cx="22" cy="298" r="3.5" fill="#22c55e">
+                  <animate attributeName="opacity" values="0;1;0" dur="1.4s" repeatCount="indefinite" />
+                </circle>
+                <g fill="white" opacity=".4">
+                  <circle cx="55" cy="30" r="1" />
+                  <circle cx="160" cy="60" r="1.2" />
+                  <circle cx="260" cy="22" r=".8" />
+                  <circle cx="350" cy="50" r="1" />
+                  <circle cx="100" cy="100" r=".8" />
+                  <circle cx="320" cy="80" r="1.2" />
+                  <circle cx="200" cy="40" r=".9" />
+                </g>
+                <path d="M 0,375 Q 100,390 200,375 Q 300,360 400,375" fill="rgba(16,56,80,.25)"
+                  stroke="rgba(16,56,80,.3)" stroke-width="1" />
+              </svg>
+            </div>
+            <div class="proj-overlay"></div>
+            <div class="proj-arrow"><svg viewBox="0 0 24 24">
+                <path d="M7 17L17 7M17 7H7M17 7v10" />
+              </svg></div>
+            <div class="proj-content">
+              <div class="proj-sector">Oil &amp; Gas · Offshore</div>
+              <div class="proj-title">FPSO Vessel Automation &amp; SCADA Integration</div>
+              <div class="proj-meta"><span>Egypt · Red Sea</span><span>2023</span><span>Full Turnkey</span></div>
+            </div>
+          </div>
+          <div class="proj">
+            <div class="proj-bg" style="background:#060d08;">
+              <svg width="100%" height="100%" viewBox="0 0 300 290" preserveAspectRatio="xMidYMid slice"
+                xmlns="http://www.w3.org/2000/svg">
+                <rect width="300" height="290" fill="#040a05" />
+                <rect x="20" y="100" width="260" height="140" fill="#07100a" stroke="#101a10" stroke-width=".5" />
+                <ellipse cx="80" cy="100" rx="52" ry="32" fill="#09140a" stroke="#121c12" stroke-width="1" />
+                <ellipse cx="195" cy="100" rx="52" ry="32" fill="#09140a" stroke="#121c12" stroke-width="1" />
+                <rect x="52" y="16" width="20" height="84" fill="#07100a" stroke="#101a10" stroke-width=".5" />
+                <rect x="93" y="28" width="15" height="72" fill="#07100a" stroke="#101a10" stroke-width=".5" />
+                <rect x="165" y="10" width="22" height="90" fill="#07100a" stroke="#101a10" stroke-width=".5" />
+                <rect x="202" y="22" width="16" height="78" fill="#07100a" stroke="#101a10" stroke-width=".5" />
+                <ellipse cx="62" cy="12" rx="9" ry="6" fill="rgba(180,200,180,.06)">
+                  <animate attributeName="cy" values="12;2;12" dur="3.5s" repeatCount="indefinite" />
+                  <animate attributeName="opacity" values=".8;.2;.8" dur="3.5s" repeatCount="indefinite" />
+                </ellipse>
+                <ellipse cx="100" cy="24" rx="7" ry="5" fill="rgba(180,200,180,.05)">
+                  <animate attributeName="cy" values="24;11;24" dur="4.2s" repeatCount="indefinite" />
+                </ellipse>
+                <ellipse cx="176" cy="6" rx="9" ry="6" fill="rgba(180,200,180,.06)">
+                  <animate attributeName="cy" values="6;-4;6" dur="3.8s" repeatCount="indefinite" />
+                </ellipse>
+                <circle cx="62" cy="16" r="2" fill="#ee2124">
+                  <animate attributeName="opacity" values="1;0;1" dur="2.2s" repeatCount="indefinite" />
+                </circle>
+                <circle cx="176" cy="10" r="2" fill="#ee2124">
+                  <animate attributeName="opacity" values="0;1;0" dur="2.2s" repeatCount="indefinite" />
+                </circle>
+                <rect x="0" y="240" width="300" height="50" fill="#030706" />
+                <text x="150" y="272" text-anchor="middle" font-family="monospace" font-size="7"
+                  fill="rgba(34,197,94,.25)" letter-spacing="2">POWER GENERATION FACILITY</text>
+              </svg>
+            </div>
+            <div class="proj-overlay"></div>
+            <div class="proj-arrow"><svg viewBox="0 0 24 24">
+                <path d="M7 17L17 7M17 7H7M17 7v10" />
+              </svg></div>
+            <div class="proj-content">
+              <div class="proj-sector">Power Utilities</div>
+              <div class="proj-title">Power Plant Control Room Upgrade</div>
+              <div class="proj-meta"><span>Cairo, Egypt</span><span>2022</span></div>
+            </div>
+          </div>
+          <div class="proj">
+            <div class="proj-bg" style="background:#080c14;">
+              <svg width="100%" height="100%" viewBox="0 0 300 290" preserveAspectRatio="xMidYMid slice"
+                xmlns="http://www.w3.org/2000/svg">
+                <rect width="300" height="290" fill="#050810" />
+                <rect x="0" y="38" width="300" height="200" fill="#06090e" />
+                <rect x="8" y="46" width="90" height="62" rx="2" fill="#08101e" stroke="#121e2e" stroke-width="1" />
+                <rect x="104" y="46" width="90" height="62" rx="2" fill="#08101e" stroke="#121e2e" stroke-width="1" />
+                <rect x="200" y="46" width="92" height="62" rx="2" fill="#08101e" stroke="#121e2e" stroke-width="1" />
+                <polyline points="13,98 30,82 47,90 64,72 81,80 95,68" fill="none" stroke="#ee2124" stroke-width="1.5"
+                  opacity=".8" />
+                <polyline points="109,98 126,88 143,93 160,76 177,84 190,70" fill="none" stroke="#22c55e"
+                  stroke-width="1.5" opacity=".8" />
+                <polyline points="205,98 222,90 239,80 256,87 273,72 288,80" fill="none" stroke="#3b82f6"
+                  stroke-width="1.5" opacity=".8" />
+                <rect x="18" y="120" width="266" height="80" rx="2" fill="#04080e" stroke="#121e2e" stroke-width="1" />
+                <g stroke="#102030" stroke-width=".8" fill="none" opacity=".7">
+                  <rect x="28" y="130" width="20" height="15" stroke="#2a3e5a" />
+                  <line x1="48" y1="137" x2="72" y2="137" />
+                  <circle cx="77" cy="137" r="6" stroke="#22c55e" />
+                  <line x1="83" y1="137" x2="106" y2="137" />
+                  <rect x="106" y="131" width="20" height="12" stroke="#ee2124" />
+                  <line x1="126" y1="137" x2="152" y2="137" />
+                  <polygon points="152,133 152,141 165,137" fill="#102030" stroke="#3b82f6" />
+                </g>
+                <rect x="24" y="215" width="256" height="30" rx="2" fill="#06090e" stroke="#0e1218" stroke-width=".5" />
+                <circle cx="45" cy="230" r="5" fill="#22c55e" opacity=".7" />
+                <circle cx="62" cy="230" r="5" fill="#ee2124" opacity=".8" />
+                <circle cx="79" cy="230" r="5" fill="#f59e0b" opacity=".7" />
+              </svg>
+            </div>
+            <div class="proj-overlay"></div>
+            <div class="proj-arrow"><svg viewBox="0 0 24 24">
+                <path d="M7 17L17 7M17 7H7M17 7v10" />
+              </svg></div>
+            <div class="proj-content">
+              <div class="proj-sector">Industrial · Process</div>
+              <div class="proj-title">Integrated Control Room Design</div>
+              <div class="proj-meta"><span>Port Said</span><span>2023</span></div>
+            </div>
+          </div>
+          <div class="proj">
+            <div class="proj-bg" style="background:#0e0906;">
+              <svg width="100%" height="100%" viewBox="0 0 300 290" preserveAspectRatio="xMidYMid slice"
+                xmlns="http://www.w3.org/2000/svg">
+                <rect width="300" height="290" fill="#0a0704" />
+                <rect x="28" y="55" width="32" height="190" fill="#120e08" stroke="#1e180e" stroke-width="1" rx="2" />
+                <rect x="90" y="28" width="36" height="217" fill="#161008" stroke="#1e180e" stroke-width="1" rx="2" />
+                <rect x="162" y="72" width="30" height="173" fill="#120e08" stroke="#1e180e" stroke-width="1" rx="2" />
+                <rect x="222" y="44" width="34" height="201" fill="#161008" stroke="#1e180e" stroke-width="1" rx="2" />
+                <ellipse cx="44" cy="55" rx="18" ry="10" fill="#1a1408" stroke="#221e0e" stroke-width=".5" />
+                <ellipse cx="108" cy="28" rx="20" ry="11" fill="#1a1408" stroke="#221e0e" stroke-width=".5" />
+                <ellipse cx="177" cy="72" rx="17" ry="9" fill="#1a1408" stroke="#221e0e" stroke-width=".5" />
+                <ellipse cx="239" cy="44" rx="19" ry="10" fill="#1a1408" stroke="#221e0e" stroke-width=".5" />
+                <line x1="60" y1="142" x2="90" y2="142" stroke="#221e0e" stroke-width="4" />
+                <line x1="126" y1="122" x2="162" y2="122" stroke="#221e0e" stroke-width="4" />
+                <line x1="192" y1="152" x2="222" y2="152" stroke="#221e0e" stroke-width="4" />
+                <line x1="272" y1="44" x2="272" y2="8" stroke="#1e180e" stroke-width="2.5" />
+                <ellipse cx="272" cy="5" rx="5" ry="9" fill="#ee2124" filter="url(#bigGlow)">
+                  <animate attributeName="ry" values="9;16;9" dur="1.1s" repeatCount="indefinite" />
+                </ellipse>
+                <rect x="0" y="245" width="300" height="45" fill="#070504" />
+                <text x="150" y="270" text-anchor="middle" font-family="monospace" font-size="7"
+                  fill="rgba(238,100,36,.3)" letter-spacing="2">OIL &amp; GAS PROCESSING PLANT</text>
+              </svg>
+            </div>
+            <div class="proj-overlay"></div>
+            <div class="proj-arrow"><svg viewBox="0 0 24 24">
+                <path d="M7 17L17 7M17 7H7M17 7v10" />
+              </svg></div>
+            <div class="proj-content">
+              <div class="proj-sector">Oil &amp; Gas · Onshore</div>
+              <div class="proj-title">Gas Plant PLC &amp; Safety Systems</div>
+              <div class="proj-meta"><span>Alexandria</span><span>2021</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ══ ABOUT ══ -->
+    <section class="about" id="about">
+      <div class="s-max">
+        <div class="about-grid">
+          <div class="about-visual reveal-left">
+            <div class="about-frame">
+              <svg width="100%" height="420" viewBox="0 0 500 420" xmlns="http://www.w3.org/2000/svg">
+                <rect width="500" height="420" fill="#080c14" />
+                <g stroke="rgba(18,38,60,.5)" stroke-width=".5">
+                  <line x1="0" y1="40" x2="500" y2="40" />
+                  <line x1="0" y1="80" x2="500" y2="80" />
+                  <line x1="0" y1="120" x2="500" y2="120" />
+                  <line x1="0" y1="160" x2="500" y2="160" />
+                  <line x1="0" y1="200" x2="500" y2="200" />
+                  <line x1="0" y1="240" x2="500" y2="240" />
+                  <line x1="0" y1="280" x2="500" y2="280" />
+                  <line x1="0" y1="320" x2="500" y2="320" />
+                  <line x1="0" y1="360" x2="500" y2="360" />
+                  <line x1="40" y1="0" x2="40" y2="420" />
+                  <line x1="80" y1="0" x2="80" y2="420" />
+                  <line x1="120" y1="0" x2="120" y2="420" />
+                  <line x1="160" y1="0" x2="160" y2="420" />
+                  <line x1="200" y1="0" x2="200" y2="420" />
+                  <line x1="240" y1="0" x2="240" y2="420" />
+                  <line x1="280" y1="0" x2="280" y2="420" />
+                  <line x1="320" y1="0" x2="320" y2="420" />
+                  <line x1="360" y1="0" x2="360" y2="420" />
+                  <line x1="400" y1="0" x2="400" y2="420" />
+                  <line x1="440" y1="0" x2="440" y2="420" />
+                </g>
+                <rect x="36" y="36" width="428" height="360" rx="3" fill="#0a0e18" stroke="#141e2e"
+                  stroke-width="1.5" />
+                <rect x="46" y="46" width="408" height="28" fill="#0c1220" rx="2" />
+                <text x="250" y="65" text-anchor="middle" font-family="'Share Tech Mono',monospace" font-size="9"
+                  fill="rgba(238,33,36,.65)" letter-spacing="4">MOTOR CONTROL CENTER — PANEL A</text>
+                <g transform="translate(56,90)">
+                  <rect x="0" y="0" width="400" height="48" fill="#08090f" rx="2" stroke="#101420" stroke-width=".5" />
+                  <text x="6" y="14" font-family="monospace" font-size="7" fill="#243850">BUS A — 400V / 50Hz</text>
+                  <g fill="none" stroke-width=".8">
+                    <rect x="4" y="16" width="22" height="28" rx="2" fill="#0c1220" stroke="#162030" />
+                    <rect x="8" y="20" width="14" height="20" rx="1" fill="#22c55e" opacity=".7" />
+                    <rect x="30" y="16" width="22" height="28" rx="2" fill="#0c1220" stroke="#162030" />
+                    <rect x="34" y="20" width="14" height="20" rx="1" fill="#22c55e" opacity=".7" />
+                    <rect x="56" y="16" width="22" height="28" rx="2" fill="#0c1220" stroke="#162030" />
+                    <rect x="60" y="20" width="14" height="20" rx="1" fill="#22c55e" opacity=".7" />
+                    <rect x="82" y="16" width="22" height="28" rx="2" fill="#0c1220" stroke="#162030" />
+                    <rect x="86" y="20" width="14" height="20" rx="1" fill="#ee2124" opacity=".8" />
+                    <rect x="108" y="16" width="22" height="28" rx="2" fill="#0c1220" stroke="#162030" />
+                    <rect x="112" y="20" width="14" height="20" rx="1" fill="#22c55e" opacity=".7" />
+                    <rect x="134" y="16" width="22" height="28" rx="2" fill="#0c1220" stroke="#162030" />
+                    <rect x="138" y="20" width="14" height="20" rx="1" fill="#f59e0b" opacity=".7" />
+                    <rect x="160" y="16" width="22" height="28" rx="2" fill="#0c1220" stroke="#162030" />
+                    <rect x="164" y="20" width="14" height="20" rx="1" fill="#22c55e" opacity=".7" />
+                    <rect x="186" y="16" width="22" height="28" rx="2" fill="#0c1220" stroke="#162030" />
+                    <rect x="190" y="20" width="14" height="20" rx="1" fill="#22c55e" opacity=".7" />
+                    <rect x="212" y="16" width="22" height="28" rx="2" fill="#0c1220" stroke="#162030" />
+                    <rect x="216" y="20" width="14" height="20" rx="1" fill="#22c55e" opacity=".7" />
+                  </g>
+                </g>
+                <g transform="translate(56,152)">
+                  <rect x="0" y="0" width="400" height="48" fill="#08090f" rx="2" stroke="#101420" stroke-width=".5" />
+                  <text x="6" y="14" font-family="monospace" font-size="7" fill="#243850">BUS B — 400V / 50Hz</text>
+                  <g fill="none" stroke-width=".8">
+                    <rect x="4" y="16" width="22" height="28" rx="2" fill="#0c1220" stroke="#162030" />
+                    <rect x="8" y="20" width="14" height="20" rx="1" fill="#22c55e" opacity=".7" />
+                    <rect x="30" y="16" width="22" height="28" rx="2" fill="#0c1220" stroke="#162030" />
+                    <rect x="34" y="20" width="14" height="20" rx="1" fill="#22c55e" opacity=".7" />
+                    <rect x="56" y="16" width="22" height="28" rx="2" fill="#0c1220" stroke="#162030" />
+                    <rect x="60" y="20" width="14" height="20" rx="1" fill="#22c55e" opacity=".7" />
+                    <rect x="82" y="16" width="22" height="28" rx="2" fill="#0c1220" stroke="#162030" />
+                    <rect x="86" y="20" width="14" height="20" rx="1" fill="#22c55e" opacity=".7" />
+                    <rect x="108" y="16" width="22" height="28" rx="2" fill="#0c1220" stroke="#162030" />
+                    <rect x="112" y="20" width="14" height="20" rx="1" fill="#3b82f6" opacity=".7" />
+                  </g>
+                </g>
+                <rect x="56" y="214" width="400" height="150" rx="2" fill="#04060c" stroke="#101e30" stroke-width="1" />
+                <text x="68" y="230" font-family="monospace" font-size="8" fill="rgba(238,33,36,.55)"
+                  letter-spacing="2">SCADA — REAL-TIME MONITORING</text>
+                <g transform="translate(66,240)">
+                  <circle cx="20" cy="42" r="16" fill="#06101c" stroke="#2a4060" stroke-width="1.5" />
+                  <text x="20" y="46" text-anchor="middle" font-family="monospace" font-size="7"
+                    fill="#3b82f6">P1</text>
+                  <line x1="36" y1="42" x2="84" y2="42" stroke="#142030" stroke-width="2" />
+                  <polygon points="84,38 84,46 98,42" fill="#162030" stroke="#3b82f6" stroke-width="1" />
+                  <line x1="98" y1="42" x2="148" y2="42" stroke="#142030" stroke-width="2" />
+                  <rect x="148" y="30" width="30" height="24" rx="2" fill="#06101c" stroke="#22c55e"
+                    stroke-width="1.5" />
+                  <text x="163" y="46" text-anchor="middle" font-family="monospace" font-size="7"
+                    fill="#22c55e">V2</text>
+                  <line x1="178" y1="42" x2="228" y2="42" stroke="#22c55e" stroke-width="2" />
+                  <circle cx="248" cy="42" r="16" fill="#06101c" stroke="#22c55e" stroke-width="1.5" />
+                  <text x="248" y="46" text-anchor="middle" font-family="monospace" font-size="7"
+                    fill="#22c55e">T1</text>
+                  <line x1="264" y1="42" x2="314" y2="42" stroke="#142030" stroke-width="2" />
+                  <rect x="314" y="30" width="24" height="24" rx="2" fill="#1a0808" stroke="#ee2124"
+                    stroke-width="1.5" />
+                  <text x="326" y="46" text-anchor="middle" font-family="monospace" font-size="8"
+                    fill="#ee2124">!</text>
+                  <polyline points="20,88 55,70 90,80 130,58 170,68 210,48 250,62 290,44 340,52" fill="none"
+                    stroke="#ee2124" stroke-width="1.5" opacity=".7" />
+                  <polyline points="20,98 55,92 90,95 130,86 170,90 210,80 250,85 290,74 340,78" fill="none"
+                    stroke="#3b82f6" stroke-width="1" opacity=".5" />
+                </g>
+                <rect x="56" y="378" width="400" height="22" rx="2" fill="#06080e" stroke="#0e1420" stroke-width=".5" />
+                <text x="70" y="392" font-family="monospace" font-size="7" fill="rgba(34,197,94,.6)"
+                  letter-spacing="1">● ONLINE</text>
+                <text x="138" y="392" font-family="monospace" font-size="7" fill="rgba(59,130,246,.6)">14/14
+                  NODES</text>
+                <text x="222" y="392" font-family="monospace" font-size="7" fill="rgba(238,33,36,.7)">1 ACTIVE
+                  ALARM</text>
+                <text x="330" y="392" font-family="monospace" font-size="7" fill="rgba(80,80,80,.5)">2024-04-27
+                  14:32</text>
+              </svg>
+            </div>
+            <div class="about-badge">
+              <div class="about-badge-n">20</div>
+              <div class="about-badge-t">Years<br>Excellence</div>
+            </div>
+          </div>
+          <div>
+            <div class="s-label reveal">Who We Are</div>
+            <h2 class="s-title reveal">Engineering<br><span style="color:var(--red)">Trust</span></h2>
+            <p class="s-desc reveal" style="margin-top:18px">PEP Arab Control Systems is a specialized industrial
+              automation company headquartered in Egypt, delivering mission-critical engineering solutions across the
+              Middle East and North Africa.</p>
+            <p style="color:var(--gray-3);font-size:14.5px;font-weight:300;line-height:1.75;margin-top:14px"
+              class="reveal">Founded on engineering excellence, we keep critical infrastructure running safely and
+              efficiently — 24 hours a day, 365 days a year. When failure is not an option, you call us.</p>
+            <ul class="about-list reveal">
+              <li>Full lifecycle engineering: design to commissioning</li>
+              <li>Multi-vendor integration expertise</li>
+              <li>ISO 9001 quality management system</li>
+              <li>24/7 emergency response and maintenance</li>
+              <li>Certified instrumentation and electrical engineers</li>
+              <li>Proven in Oil &amp; Gas, Marine, Power, and Industry</li>
+            </ul>
+            <div class="certs reveal">
+              <div class="cert">ISO 9001</div>
+              <div class="cert">IEC 61511</div>
+              <div class="cert">IEC 62443</div>
+              <div class="cert">DNV</div>
+              <div class="cert">ATEX</div>
+              <div class="cert">SIL-2</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ══ TESTIMONIALS ══ -->
+    <section class="testimonials" style="background:var(--black-2)">
+      <div class="s-max">
+        <div class="s-label reveal">Client Voices</div>
+        <h2 class="s-title reveal">What Clients <span style="color:var(--red)">Say</span></h2>
+        <div class="testi-grid">
+          <div class="testi reveal">
+            <div class="testi-quote">"</div>
+            <p class="testi-text">PEP Arab delivered our offshore SCADA system on time and within budget. Their
+              technical depth and professionalism were exceptional. Zero unplanned downtime since commissioning.</p>
+            <div class="testi-author">
+              <div class="testi-av">AH</div>
+              <div>
+                <div class="testi-name">Ahmed Hassan</div>
+                <div class="testi-role">Operations Director · Petro-Gulf</div>
+              </div>
+            </div>
+          </div>
+          <div class="testi reveal" style="transition-delay:.12s">
+            <div class="testi-quote">"</div>
+            <p class="testi-text">The vessel automation PEP Arab installed transformed our operational efficiency. Their
+              marine engineering expertise is unmatched in the region. An outstanding partner.</p>
+            <div class="testi-author">
+              <div class="testi-av">KM</div>
+              <div>
+                <div class="testi-name">Karim Mansour</div>
+                <div class="testi-role">Technical Manager · Nile Shipping</div>
+              </div>
+            </div>
+          </div>
+          <div class="testi reveal" style="transition-delay:.24s">
+            <div class="testi-quote">"</div>
+            <p class="testi-text">Their PLC team completely transformed our manufacturing line. Downtime dropped 40% and
+              we gained real-time visibility we never had. We trust them completely.</p>
+            <div class="testi-author">
+              <div class="testi-av">SM</div>
+              <div>
+                <div class="testi-name">Sara Mohamed</div>
+                <div class="testi-role">Plant Manager · EgyptChem Ind.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ══ CTA ══ -->
+    <section class="cta-sec" id="contact">
+      <div class="cta-glow"></div>
+      <div class="cta-lines"></div>
+      <div class="cta-title reveal">
+        <span class="outline">Ready to</span>
+        <span class="red">Automate</span>
+        <span class="solid">Your Future?</span>
+      </div>
+      <p class="cta-desc reveal">Talk to our engineers about your next mission-critical project. Precision, reliability,
+        and trust — delivered on time, every time.</p>
+      <div class="cta-actions reveal">
+        <a href="mailto:info@peparab.com" class="btn-primary">Contact Sales Team</a>
+        <a href="tel:+20" class="btn-outline">Call Us Now</a>
+      </div>
+    </section>
+
+    <!-- ══ FOOTER ══ -->
+    <footer>
+      <div class="footer-grid">
+        <div>
+          <div class="footer-logo"><img src="logo.png" alt="PEP Arab Control Systems"></div>
+          <p class="footer-desc">Mission-critical industrial automation and control systems engineering — for the
+            sectors where failure is never an option.</p>
+          <div class="footer-contact">
+            <div class="fc-item"><svg viewBox="0 0 24 24" stroke-width="1.5">
+                <path
+                  d="M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25m19.5 0v.243a2.25 2.25 0 01-1.07 1.916l-7.5 4.615a2.25 2.25 0 01-2.36 0L3.32 8.91a2.25 2.25 0 01-1.07-1.916V6.75" />
+              </svg>info@peparab.com</div>
+            <div class="fc-item"><svg viewBox="0 0 24 24" stroke-width="1.5">
+                <path d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z" />
+                <path d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z" />
+              </svg>Cairo, Egypt — MENA Region</div>
+          </div>
+        </div>
+        <div>
+          <div class="f-heading">Services</div>
+          <ul class="f-links">
+            <li><a href="#services">Industrial Control</a></li>
+            <li><a href="#services">Marine Automation</a></li>
+            <li><a href="#services">LV Power Systems</a></li>
+            <li><a href="#services">Technical Training</a></li>
+            <li><a href="#services">System Integration</a></li>
+          </ul>
+        </div>
+        <div>
+          <div class="f-heading">Products</div>
+          <ul class="f-links">
+            <li><a href="#products">PLC Systems</a></li>
+            <li><a href="#products">SCADA / HMI</a></li>
+            <li><a href="#products">Panel PCs &amp; IPC</a></li>
+            <li><a href="#products">MCC Panels</a></li>
+            <li><a href="#products">Instrumentation</a></li>
+          </ul>
+        </div>
+        <div>
+          <div class="f-heading">Company</div>
+          <ul class="f-links">
+            <li><a href="#about">About PEP Arab</a></li>
+            <li><a href="#projects">Projects</a></li>
+            <li><a href="#contact">Contact</a></li>
+            <li><a href="#">Careers</a></li>
+            <li><a href="https://peparab.com" target="_blank">Visit Website ↗</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <div class="f-copy">© 2024 PEP Arab Control Systems®. All rights reserved.</div>
+        <div class="f-socials">
+          <a href="#"><svg viewBox="0 0 24 24">
+              <path d="M16 8a6 6 0 016 6v7h-4v-7a2 2 0 00-2-2 2 2 0 00-2 2v7h-4v-7a6 6 0 016-6zM2 9h4v12H2z" />
+              <circle cx="4" cy="4" r="2" />
+            </svg></a>
+          <a href="#"><svg viewBox="0 0 24 24">
+              <path
+                d="M23 3a10.9 10.9 0 01-3.14 1.53 4.48 4.48 0 00-7.86 3v1A10.66 10.66 0 013 4s-4 9 5 13a11.64 11.64 0 01-7 2c9 5 20 0 20-11.5a4.5 4.5 0 00-.08-.83A7.72 7.72 0 0023 3z" />
+            </svg></a>
+          <a href="#"><svg viewBox="0 0 24 24">
+              <circle cx="12" cy="12" r="10" />
+              <path
+                d="M8.56 2.75c4.37 6.03 6.02 9.42 8.03 17.72m2.54-15.38c-3.72 4.35-8.94 5.66-16.88 5.85m19.5 1.9c-3.5-.93-6.63-.82-8.94 0-2.58.92-5.01 2.86-7.44 6.32" />
+            </svg></a>
+        </div>
+      </div>
+    </footer>
+
+    <style>
+      @keyframes spinDash {
+        from {
+          stroke-dashoffset: 70
+        }
+
+        to {
+          stroke-dashoffset: -68
+        }
+      }
+    </style>
+
+    <script>
+      // ── CUSTOM CURSOR ──
+      const cur = document.getElementById('cursor');
+      const ring = document.getElementById('cursor-ring');
+      let mx = 0, my = 0, rx = 0, ry = 0;
+      document.addEventListener('mousemove', e => { mx = e.clientX; my = e.clientY; cur.style.left = mx + 'px'; cur.style.top = my + 'px' });
+      function animRing() { rx += (mx - rx) * .12; ry += (my - ry) * .12; ring.style.left = rx + 'px'; ring.style.top = ry + 'px'; requestAnimationFrame(animRing) }
+      animRing();
+      document.querySelectorAll('a,button,.svc,.proj,.prod,.testi').forEach(el => {
+        el.addEventListener('mouseenter', () => { cur.style.width = '20px'; cur.style.height = '20px'; cur.style.opacity = '.5'; ring.style.width = '60px'; ring.style.height = '60px'; ring.style.borderColor = 'rgba(238,33,36,0.8)' });
+        el.addEventListener('mouseleave', () => { cur.style.width = '12px'; cur.style.height = '12px'; cur.style.opacity = '1'; ring.style.width = '36px'; ring.style.height = '36px'; ring.style.borderColor = 'rgba(238,33,36,0.5)' });
+      });
+
+      // ── PARTICLES CANVAS ──
+      const canvas = document.getElementById('particles-canvas');
+      const ctx = canvas.getContext('2d');
+      let W, H, particles = [];
+      function resize() { W = canvas.width = window.innerWidth; H = canvas.height = window.innerHeight }
+      resize(); window.addEventListener('resize', resize);
+      class Particle {
+        constructor() { this.reset() }
+        reset() { this.x = Math.random() * W; this.y = Math.random() * H; this.size = Math.random() * 1.5 + .3; this.speedX = (Math.random() - .5) * .4; this.speedY = (Math.random() - .5) * .4; this.opacity = Math.random() * .5 + .1; this.color = Math.random() > .85 ? 'rgba(238,33,36,' : 'rgba(255,255,255,' }
+        update() { this.x += this.speedX; this.y += this.speedY; if (this.x < 0 || this.x > W || this.y < 0 || this.y > H) this.reset() }
+        draw() { ctx.beginPath(); ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2); ctx.fillStyle = this.color + this.opacity + ')'; ctx.fill() }
+      }
+      for (let i = 0; i < 120; i++)particles.push(new Particle());
+      function animParticles() { ctx.clearRect(0, 0, W, H); particles.forEach(p => { p.update(); p.draw() }); requestAnimationFrame(animParticles) }
+      animParticles();
+
+      // ── NAV SCROLL ──
+      window.addEventListener('scroll', () => { document.getElementById('mainNav').classList.toggle('scrolled', scrollY > 60) });
+
+      // ── MOBILE MENU ──
+      function toggleMenu() { document.getElementById('mobileNav').classList.toggle('open') }
+
+      // ── INTERSECTION OBSERVER ──
+      const io = new IntersectionObserver(entries => { entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible') }) }, { threshold: .12, rootMargin: '0px 0px -50px 0px' });
+      document.querySelectorAll('.reveal,.reveal-left,.reveal-scale').forEach(el => io.observe(el));
+
+      // ── COUNTER ANIMATION ──
+      const counterIO = new IntersectionObserver(entries => {
+        entries.forEach(e => {
+          if (e.isIntersecting && !e.target.dataset.done) {
+            e.target.dataset.done = '1';
+            e.target.querySelectorAll('.counter').forEach(c => {
+              const target = +c.dataset.target;
+              let start = 0, t0 = null;
+              const dur = 2200;
+              function step(t) { if (!t0) t0 = t; const p = Math.min((t - t0) / dur, 1); const ease = 1 - Math.pow(1 - p, 4); c.textContent = Math.floor(ease * target); if (p < 1) requestAnimationFrame(step) }
+              requestAnimationFrame(step);
+            });
+          }
+        });
+      }, { threshold: .5 });
+      const ns = document.querySelector('.numbers'); if (ns) counterIO.observe(ns);
+
+      // ── MAGNETIC BUTTONS ──
+      document.querySelectorAll('.btn-primary,.btn-outline').forEach(btn => {
+        btn.addEventListener('mousemove', e => {
+          const r = btn.getBoundingClientRect();
+          const x = (e.clientX - r.left - r.width / 2) * .3;
+          const y = (e.clientY - r.top - r.height / 2) * .3;
+          btn.style.transform = 'translate(' + x + 'px,' + y + 'px)';
+        });
+        btn.addEventListener('mouseleave', () => { btn.style.transform = 'translate(0,0)' });
+      });
+
+      // ── PARALLAX HERO ──
+      window.addEventListener('scroll', () => {
+        const s = scrollY;
+        document.querySelector('.hero-grid').style.transform = 'translateY(' + (s * .15) + 'px) translateX(' + (s * .05) + 'px)';
+        document.querySelector('.hero-diag').style.transform = 'translateY(' + (s * .08) + 'px)';
+      });
+    </script>
+  </body>
+
+  </html>
